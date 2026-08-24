@@ -1,0 +1,33 @@
+{
+  "name": "deguste-app",
+  "version": "1.0.0",
+  "description": "Plataforma de Gestão para Bares e Restaurantes",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx http-server -p 8000",
+    "serve": "npx http-server",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "restaurant",
+    "bar",
+    "management",
+    "platform",
+    "digital",
+    "menu"
+  ],
+  "author": "DeGustte Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/seu-usuario/deguste-app.git"
+  },
+  "bugs": {
+    "url": "https://github.com/seu-usuario/deguste-app/issues"
+  },
+  "homepage": "https://github.com/seu-usuario/deguste-app#readme",
+  "devDependencies": {},
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
