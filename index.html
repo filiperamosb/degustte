@@ -22,12 +22,14 @@
             background: white;
             padding: 20px 40px;
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
+            justify-content: center;
             align-items: center;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             position: sticky;
             top: 0;
             z-index: 100;
+            gap: 20px;
         }
 
         .logo {
@@ -41,7 +43,7 @@
         }
 
         .logo img {
-            height: 40px;
+            height: 60px;
             width: auto;
         }
 
@@ -49,7 +51,7 @@
             display: flex;
             gap: 40px;
             align-items: center;
-            flex: 1;
+            justify-content: center;
         }
 
         nav a {
@@ -66,7 +68,7 @@
         .nav-buttons {
             display: flex;
             gap: 15px;
-            margin-left: auto;
+            justify-content: center;
         }
 
         .btn-cadastro-nav {
