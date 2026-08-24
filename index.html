@@ -328,13 +328,67 @@
         .feature-section {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 60px;
+            gap: 80px;
             align-items: center;
-            margin-bottom: 80px;
+            margin-bottom: 100px;
         }
 
         .feature-section:nth-child(even) {
             direction: rtl;
+        }
+
+        .feature-section-content {
+            direction: ltr;
+        }
+
+        .feature-section h2 {
+            font-size: 44px;
+            margin-bottom: 30px;
+            color: #1a1a1a;
+            line-height: 1.3;
+        }
+
+        .feature-section p {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.8;
+        }
+
+        .feature-list {
+            list-style: none;
+            margin-bottom: 40px;
+        }
+
+        .feature-list li {
+            font-size: 16px;
+            color: #1a1a1a;
+            margin-bottom: 15px;
+            padding-left: 40px;
+            position: relative;
+        }
+
+        .feature-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #FF6B35;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        .feature-section-image {
+            width: 100%;
+            height: auto;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+        }
+
+        .feature-section-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .feature-section:nth-child(even) > * {
