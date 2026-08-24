@@ -24,7 +24,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
             position: sticky;
             top: 0;
             z-index: 100;
@@ -33,7 +33,7 @@
         .logo {
             font-size: 24px;
             font-weight: 700;
-            color: #FF6B35;
+            color: #1a1a1a;
             text-decoration: none;
             display: flex;
             align-items: center;
@@ -41,8 +41,7 @@
         }
 
         .logo img {
-            height: 50px;
-            width: auto;
+            display: none;
         }
 
         nav {
@@ -56,13 +55,21 @@
 
         nav a {
             text-decoration: none;
-            color: #333;
+            color: #666;
             font-weight: 500;
+            font-size: 15px;
             transition: color 0.3s;
         }
 
+        nav a:first-child {
+            background: #1a1a1a;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+        }
+
         nav a:hover {
-            color: #FF6B35;
+            color: #1a1a1a;
         }
 
         .nav-buttons {
@@ -72,37 +79,37 @@
         }
 
         .btn-cadastro-nav {
-            padding: 10px 25px;
-            background: #FF6B35;
-            color: white;
+            padding: 8px 16px;
+            background: transparent;
+            color: #666;
             border: none;
             border-radius: 6px;
             cursor: pointer;
-            font-weight: 600;
+            font-weight: 500;
             text-decoration: none;
             transition: all 0.3s;
             display: inline-block;
+            font-size: 14px;
         }
 
         .btn-cadastro-nav:hover {
-            background: #E55A25;
-            transform: translateY(-2px);
+            color: #1a1a1a;
         }
 
         .btn-login {
-            padding: 8px 20px;
-            background: transparent;
-            border: 2px solid #FF6B35;
-            color: #FF6B35;
+            padding: 8px 16px;
+            background: #1a1a1a;
+            border: none;
+            color: white;
             border-radius: 6px;
             cursor: pointer;
             font-weight: 600;
             transition: all 0.3s;
+            font-size: 14px;
         }
 
         .btn-login:hover {
-            background: #FF6B35;
-            color: white;
+            background: #333;
         }
 
         /* Hero Section */
