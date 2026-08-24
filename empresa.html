@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Empresa - DeGustte</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f9f9f9;
+            color: #333;
+        }
+
+        /* Header */
+        header {
+            background: white;
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #FF6B35;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo img {
+            height: 40px;
+        }
+
+        .nav-links a {
+            margin-left: 30px;
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            color: #FF6B35;
+        }
+
+        /* Banner */
+        .banner {
+            width: 100%;
+            height: 300px;
+            background: linear-gradient(135deg, #FF6B35 0%, #FFB84D 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .banner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Empresa Info */
+        .empresa-header {
+            background: white;
+            padding: 40px;
+            display: grid;
+            grid-template-columns: 150px 1fr;
+            gap: 40px;
+            align-items: start;
+            margin-top: -60px;
+            position: relative;
+            z-index: 10;
+            margin-left: 40px;
+            margin-right: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .logo-empresa {
+            width: 150px;
+            height: 150px;
+            background: white;
+            border: 3px solid #FF6B35;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .logo-empresa img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .info-empresa h1 {
+            font-size: 36px;
+            color: #1a1a1a;
+            margin-bottom: 10px;
+        }
+
+        .info-empresa .tipo {
+            display: inline-block;
+            background: #FF6B35;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .info-empresa .cidade {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        .contatos {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .contato-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #666;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .contato-item:hover {
+            color: #FF6B35;
+        }
+
+        .contato-item a {
+            color: #FF6B35;
+            text-decoration: none;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 40px;
+        }
+
+        /* Seções */
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .section h2 {
+            font-size: 24px;
+            color: #1a1a1a;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #FF6B35;
+        }
+
+        .descricao {
+            font-size: 16px;
+            line-height: 1.8;
+            color: #555;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .info-card {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #FF6B35;
+        }
+
+        .info-card .label {
+            font-size: 12px;
+            color: #999;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .info-card .value {
+            font-size: 16px;
+            color: #1a1a1a;
+            font-weight: 500;
+        }
+
+        .redes-sociais {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .social-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            background: #FF6B35;
+            color: white;
+            border-radius: 50%;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .social-link:hover {
+            background: #E55A25;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(255, 107, 53, 0.2);
+        }
+
+        .cta-section {
+            background: linear-gradient(135deg, #FF6B35 0%, #FFB84D 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 12px;
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .cta-section h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        .cta-section p {
+            font-size: 16px;
+            margin-bottom: 25px;
+            opacity: 0.9;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 14px 40px;
+            background: white;
+            color: #FF6B35;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .not-found {
+            text-align: center;
+            padding: 80px 40px;
+        }
+
+        .not-found h2 {
+            font-size: 36px;
+            color: #1a1a1a;
+            margin-bottom: 15px;
+        }
+
+        .not-found p {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .not-found a {
+            display: inline-block;
+            padding: 12px 30px;
+            background: #FF6B35;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        /* Galeria de Cardápio */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .menu-item {
+            background: #f9f9f9;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .menu-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+
+        .menu-item-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .menu-item h4 {
+            font-size: 14px;
+            color: #1a1a1a;
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .empresa-header {
+                grid-template-columns: 1fr;
+                margin-left: 20px;
+                margin-right: 20px;
+                padding: 25px;
+            }
+
+            .banner {
+                height: 200px;
+            }
+
+            .info-empresa h1 {
+                font-size: 24px;
+            }
+
+            .container {
+                padding: 0 20px;
+            }
+
+            .section {
+                padding: 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <a href="index.html" class="logo">
+            <img src="https://i.ibb.co/rfHMWNkf/degusste.png" alt="DeGustte">
+            DeGustte
+        </a>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="cadastro.html">Registrar Empresa</a>
+        </div>
+    </header>
+
+    <!-- Banner -->
+    <div class="banner" id="banner">
+        🖼️ Banner Principal
+    </div>
+
+    <!-- Conteúdo -->
+    <div class="container">
+        <!-- Info Empresa -->
+        <div class="empresa-header" id="empresaHeader">
+            <div class="logo-empresa" id="logoContainer">
+                🏪
+            </div>
+            <div class="info-empresa" id="infoEmpresa">
+                <!-- Preenchido por JavaScript -->
+            </div>
+        </div>
+
+        <!-- Seção Sobre -->
+        <div class="section" id="secaoSobre">
+            <h2>Sobre</h2>
+            <p class="descricao" id="descricao"></p>
+        </div>
+
+        <!-- Seção Informações -->
+        <div class="section">
+            <h2>Informações</h2>
+            <div class="info-grid" id="infoGrid">
+                <!-- Preenchido por JavaScript -->
+            </div>
+        </div>
+
+        <!-- Seção Redes Sociais -->
+        <div class="section" id="secaoRedes" style="display: none;">
+            <h2>Encontre-nos</h2>
+            <div class="redes-sociais" id="redesSociais">
+                <!-- Preenchido por JavaScript -->
+            </div>
+        </div>
+
+        <!-- CTA -->
+        <div class="cta-section">
+            <h3>Pronto para pedir?</h3>
+            <p>Explore nosso cardápio e faça seu pedido agora!</p>
+            <a href="#" class="btn" id="btnCardapio">Ver Cardápio Digital</a>
+        </div>
+    </div>
+
+    <!-- Página não encontrada (hidden) -->
+    <div id="notFound" style="display: none;">
+        <div class="not-found">
+            <h2>❌ Empresa não encontrada</h2>
+            <p>Desculpe, não conseguimos encontrar a empresa que você procura.</p>
+            <a href="cadastro.html">Registrar sua empresa</a>
+        </div>
+    </div>
+
+    <script>
+        // Pegar slug da URL
+        const params = new URLSearchParams(window.location.search);
+        const slug = params.get('slug');
+
+        if (!slug) {
+            document.getElementById('notFound').style.display = 'block';
+            document.querySelector('.banner').style.display = 'none';
+            document.querySelector('.empresa-header').style.display = 'none';
+            document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+            document.querySelector('.cta-section').style.display = 'none';
+        } else {
+            // Carregar empresa do localStorage
+            const empresas = JSON.parse(localStorage.getItem('empresas')) || [];
+            const empresa = empresas.find(e => e.slug === slug);
+
+            if (empresa) {
+                // Atualizar título
+                document.title = `${empresa.nomeEmpresa} - DeGustte`;
+
+                // Banner
+                const bannerDiv = document.getElementById('banner');
+                if (empresa.banner) {
+                    bannerDiv.style.backgroundImage = `url('data:image/*;base64,...')`;
+                    bannerDiv.textContent = '';
+                }
+
+                // Logo e Info
+                const logoContainer = document.getElementById('logoContainer');
+                const infoEmpresa = document.getElementById('infoEmpresa');
+
+                infoEmpresa.innerHTML = `
+                    <h1>${empresa.nomeEmpresa}</h1>
+                    <span class="tipo">${empresa.tipo.charAt(0).toUpperCase() + empresa.tipo.slice(1)}</span>
+                    <div class="cidade">📍 ${empresa.endereco}, ${empresa.numero} - ${empresa.cidade}</div>
+                    <div class="contatos">
+                        <a href="tel:${empresa.telefone}" class="contato-item">
+                            📞 ${empresa.telefone}
+                        </a>
+                        <a href="mailto:${empresa.email}" class="contato-item">
+                            📧 ${empresa.email}
+                        </a>
+                    </div>
+                `;
+
+                // Descrição
+                document.getElementById('descricao').textContent = empresa.descricao;
+
+                // Info Grid
+                const infoGrid = document.getElementById('infoGrid');
+                infoGrid.innerHTML = `
+                    <div class="info-card">
+                        <div class="label">Localização</div>
+                        <div class="value">📍 ${empresa.bairro || 'Não informado'}</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="label">Telefone</div>
+                        <div class="value"><a href="tel:${empresa.telefone}" style="color: #FF6B35; text-decoration: none;">${empresa.telefone}</a></div>
+                    </div>
+                `;
+
+                // Redes Sociais
+                const redesSociais = document.getElementById('redesSociais');
+                const secaoRedes = document.getElementById('secaoRedes');
+
+                let redesHtml = '';
+
+                if (empresa.instagram) {
+                    redesHtml += `<a href="https://instagram.com/${empresa.instagram.replace('@', '')}" target="_blank" class="social-link" title="Instagram">📷</a>`;
+                }
+                if (empresa.facebook) {
+                    redesHtml += `<a href="${empresa.facebook}" target="_blank" class="social-link" title="Facebook">f</a>`;
+                }
+
+                if (redesHtml) {
+                    redesSociais.innerHTML = redesHtml;
+                    secaoRedes.style.display = 'block';
+                }
+
+                // WhatsApp Button
+                document.getElementById('btnCardapio').href = `https://api.whatsapp.com/send?phone=55${empresa.telefone.replace(/\D/g, '')}&text=Olá! Gostaria de conhecer o cardápio.`;
+
+            } else {
+                document.getElementById('notFound').style.display = 'block';
+                document.querySelector('.banner').style.display = 'none';
+                document.querySelector('.empresa-header').style.display = 'none';
+                document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+                document.querySelector('.cta-section').style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

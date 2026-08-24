@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Empresas Cadastradas - DeGustte</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%);
+            min-height: 100vh;
+        }
+
+        header {
+            background: white;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #FF6B35;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo img {
+            height: 40px;
+        }
+
+        nav a {
+            margin-left: 30px;
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: #FF6B35;
+        }
+
+        .btn-cadastro {
+            padding: 10px 25px;
+            background: #FF6B35;
+            color: white;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-cadastro:hover {
+            background: #E55A25;
+            transform: translateY(-2px);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .page-header h1 {
+            font-size: 42px;
+            color: #1a1a1a;
+            margin-bottom: 15px;
+        }
+
+        .page-header p {
+            font-size: 18px;
+            color: #666;
+        }
+
+        .filtros {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .filtros input,
+        .filtros select {
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .filtros input:focus,
+        .filtros select:focus {
+            outline: none;
+            border-color: #FF6B35;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .empresas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .empresa-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .empresa-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+        }
+
+        .empresa-banner {
+            width: 100%;
+            height: 150px;
+            background: linear-gradient(135deg, #FF6B35 0%, #FFB84D 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .empresa-banner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .empresa-info {
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .empresa-header {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            align-items: flex-start;
+        }
+
+        .empresa-logo {
+            width: 60px;
+            height: 60px;
+            background: #f5f5f5;
+            border: 2px solid #FF6B35;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .empresa-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .empresa-details h3 {
+            font-size: 18px;
+            color: #1a1a1a;
+            margin-bottom: 5px;
+        }
+
+        .empresa-details .tipo {
+            display: inline-block;
+            background: #FF6B35;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .empresa-details .cidade {
+            color: #666;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+
+        .empresa-descricao {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 15px;
+            flex: 1;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .empresa-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+            font-size: 13px;
+            color: #999;
+        }
+
+        .contato-rapido {
+            display: flex;
+            gap: 8px;
+        }
+
+        .contato-rapido a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            background: #FF6B35;
+            color: white;
+            border-radius: 50%;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .contato-rapido a:hover {
+            background: #E55A25;
+            transform: scale(1.1);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .empty-state h2 {
+            font-size: 28px;
+            color: #1a1a1a;
+            margin-bottom: 15px;
+        }
+
+        .empty-state p {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .btn-primary {
+            display: inline-block;
+            padding: 12px 40px;
+            background: #FF6B35;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            background: #E55A25;
+            transform: translateY(-2px);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .stat-number {
+            font-size: 36px;
+            color: #FF6B35;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .empresas-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page-header h1 {
+                font-size: 28px;
+            }
+
+            .filtros {
+                flex-direction: column;
+            }
+
+            .search-box {
+                min-width: unset;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <a href="index.html" class="logo">
+            <img src="https://i.ibb.co/rfHMWNkf/degusste.png" alt="DeGustte">
+            DeGustte
+        </a>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="empresas.html">Empresas</a>
+            <a href="cadastro.html" class="btn-cadastro">Registrar Empresa</a>
+        </nav>
+    </header>
+
+    <!-- Conteúdo -->
+    <div class="container">
+        <div class="page-header">
+            <h1>Empresas Cadastradas</h1>
+            <p>Encontre o melhor restaurante, bar ou lanchonete perto de você</p>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats" id="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="totalEmpresas">0</div>
+                <div class="stat-label">Empresas Cadastradas</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalCidades">0</div>
+                <div class="stat-label">Cidades</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalTipos">0</div>
+                <div class="stat-label">Tipos de Negócios</div>
+            </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="filtros">
+            <input type="text" id="searchInput" class="search-box" placeholder="🔍 Buscar por nome ou cidade...">
+            <select id="tipoFiltro">
+                <option value="">Todos os tipos</option>
+                <option value="restaurante">Restaurante</option>
+                <option value="bar">Bar</option>
+                <option value="pizzaria">Pizzaria</option>
+                <option value="lanchonete">Lanchonete</option>
+                <option value="cafe">Café</option>
+                <option value="doceria">Doçaria</option>
+            </select>
+            <select id="cidadeFiltro">
+                <option value="">Todas as cidades</option>
+            </select>
+        </div>
+
+        <!-- Grid de Empresas -->
+        <div class="empresas-grid" id="empresasGrid">
+            <!-- Preenchido por JavaScript -->
+        </div>
+
+        <!-- Estado Vazio -->
+        <div id="emptyState" class="empty-state" style="display: none;">
+            <h2>Nenhuma empresa encontrada</h2>
+            <p>Que tal registrar sua empresa na DeGustte e começar a atrair clientes?</p>
+            <a href="cadastro.html" class="btn-primary">Registrar Empresa Agora</a>
+        </div>
+    </div>
+
+    <script>
+        const searchInput = document.getElementById('searchInput');
+        const tipoFiltro = document.getElementById('tipoFiltro');
+        const cidadeFiltro = document.getElementById('cidadeFiltro');
+        const empresasGrid = document.getElementById('empresasGrid');
+        const emptyState = document.getElementById('emptyState');
+
+        let empresas = JSON.parse(localStorage.getItem('empresas')) || [];
+
+        // Carregar empresas
+        function carregarEmpresas() {
+            empresas = JSON.parse(localStorage.getItem('empresas')) || [];
+            atualizarFiltros();
+            atualizar Stats();
+            filtrarEmpresas();
+        }
+
+        // Atualizar selects de filtro
+        function atualizarFiltros() {
+            const cidades = [...new Set(empresas.map(e => e.cidade))];
+            cidadeFiltro.innerHTML = '<option value="">Todas as cidades</option>';
+            cidades.forEach(cidade => {
+                const option = document.createElement('option');
+                option.value = cidade;
+                option.textContent = cidade;
+                cidadeFiltro.appendChild(option);
+            });
+        }
+
+        // Atualizar estatísticas
+        function atualizarStats() {
+            document.getElementById('totalEmpresas').textContent = empresas.length;
+            const cidades = new Set(empresas.map(e => e.cidade)).size;
+            document.getElementById('totalCidades').textContent = cidades;
+            const tipos = new Set(empresas.map(e => e.tipo)).size;
+            document.getElementById('totalTipos').textContent = tipos;
+        }
+
+        // Filtrar empresas
+        function filtrarEmpresas() {
+            const termo = searchInput.value.toLowerCase();
+            const tipo = tipoFiltro.value;
+            const cidade = cidadeFiltro.value;
+
+            const filtradas = empresas.filter(empresa => {
+                const correspondeNome = empresa.nomeEmpresa.toLowerCase().includes(termo) ||
+                                       empresa.cidade.toLowerCase().includes(termo);
+                const correspondeTipo = !tipo || empresa.tipo === tipo;
+                const correspondeCidade = !cidade || empresa.cidade === cidade;
+
+                return correspondeNome && correspondeTipo && correspondeCidade;
+            });
+
+            empresasGrid.innerHTML = '';
+
+            if (filtradas.length === 0) {
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+
+            filtradas.forEach(empresa => {
+                const card = document.createElement('a');
+                card.href = `empresa.html?slug=${empresa.slug}`;
+                card.className = 'empresa-card';
+
+                card.innerHTML = `
+                    <div class="empresa-banner">🖼️</div>
+                    <div class="empresa-info">
+                        <div class="empresa-header">
+                            <div class="empresa-logo">🏪</div>
+                            <div class="empresa-details">
+                                <h3>${empresa.nomeEmpresa}</h3>
+                                <span class="tipo">${empresa.tipo}</span>
+                                <div class="cidade">📍 ${empresa.cidade}</div>
+                            </div>
+                        </div>
+                        <p class="empresa-descricao">${empresa.descricao}</p>
+                        <div class="empresa-meta">
+                            <span>📞 ${empresa.telefone}</span>
+                            <div class="contato-rapido">
+                                <a href="tel:${empresa.telefone}" title="Ligar">☎️</a>
+                                <a href="https://api.whatsapp.com/send?phone=55${empresa.telefone.replace(/\D/g, '')}" title="WhatsApp" target="_blank">💬</a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                empresasGrid.appendChild(card);
+            });
+        }
+
+        // Event listeners
+        searchInput.addEventListener('input', filtrarEmpresas);
+        tipoFiltro.addEventListener('change', filtrarEmpresas);
+        cidadeFiltro.addEventListener('change', filtrarEmpresas);
+
+        // Carregar ao iniciar
+        carregarEmpresas();
+
+        // Atualizar a cada 2 segundos (para detectar novos cadastros em tempo real)
+        setInterval(() => {
+            const novasEmpresas = JSON.parse(localStorage.getItem('empresas')) || [];
+            if (novasEmpresas.length !== empresas.length) {
+                carregarEmpresas();
+            }
+        }, 2000);
+    </script>
+</body>
+</html>
