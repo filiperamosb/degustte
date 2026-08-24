@@ -49,6 +49,7 @@
             display: flex;
             gap: 40px;
             align-items: center;
+            flex: 1;
         }
 
         nav a {
@@ -65,6 +66,25 @@
         .nav-buttons {
             display: flex;
             gap: 15px;
+            margin-left: auto;
+        }
+
+        .btn-cadastro-nav {
+            padding: 10px 25px;
+            background: #FF6B35;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+
+        .btn-cadastro-nav:hover {
+            background: #E55A25;
+            transform: translateY(-2px);
         }
 
         .btn-login {
@@ -424,6 +444,49 @@
             box-shadow: 0 10px 20px rgba(0,0,0,0.2);
         }
 
+        .criar-loja-section {
+            background: linear-gradient(135deg, #FFB84D 0%, #FF6B35 100%);
+            color: white;
+            text-align: center;
+            padding: 80px 40px;
+            border-radius: 12px;
+            margin: 60px 40px;
+        }
+
+        .criar-loja-section h2 {
+            font-size: 42px;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .criar-loja-section p {
+            font-size: 18px;
+            margin-bottom: 35px;
+            opacity: 0.95;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .btn-criar-loja {
+            padding: 16px 50px;
+            background: white;
+            color: #FF6B35;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-criar-loja:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+        }
+
         /* Footer */
         footer {
             background: #1a1a1a;
@@ -539,8 +602,9 @@
             <a href="#home">Home</a>
             <a href="#preco">Preço</a>
             <a href="#blog">Blog</a>
-            <a href="https://api.whatsapp.com/send?phone=+5511945941614&text=Ol%C3%A1,%20gostaria%20de%20saber%20mais%20sobre%20o%20Bateu%20a%20Fome!" target="_blank">Fale com um atendente</a>
+            <a href="https://api.whatsapp.com/send?phone=+5511945941614&text=Ol%C3%A1,%20gostaria%20de%20saber%20mais%20sobre%20o%20DeGustte!" target="_blank">Fale com um atendente</a>
             <div class="nav-buttons">
+                <a href="cadastro-pagamento.html" class="btn-cadastro-nav">Criar Loja</a>
                 <button class="btn-login">Login</button>
             </div>
         </nav>
@@ -554,6 +618,13 @@
         <p style="font-size: 14px; margin-bottom: 30px;">Uma plataforma completa, criada para acompanhar a rotina do seu negócio, facilitar a operação e ajudar você a crescer.</p>
         <a href="#" class="btn-primary">Saiba Mais</a>
         <div class="hero-image">📱 Mockups do aplicativo DeGustte em smartphones</div>
+    </section>
+
+    <!-- Criar Loja Section -->
+    <section class="criar-loja-section">
+        <h2>🏪 Pronto para ter sua loja online?</h2>
+        <p>Registre sua empresa na DeGustte e ganhe seu próprio espaço para atrair mais clientes!</p>
+        <a href="cadastro-pagamento.html" class="btn-criar-loja">Criar Minha Loja Agora</a>
     </section>
 
     <!-- Restaurants Section -->

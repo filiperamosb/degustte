@@ -480,6 +480,9 @@
         const successMessage = document.getElementById('successMessage');
         const errorMessage = document.getElementById('errorMessage');
 
+        let logoBase64 = '';
+        let bannerBase64 = '';
+
         // Gerar slug automático
         nomeEmpresa.addEventListener('input', () => {
             const slug = nomeEmpresa.value
@@ -497,8 +500,9 @@
             if (file) {
                 const reader = new FileReader();
                 reader.onload = (event) => {
+                    logoBase64 = event.target.result;
                     logoPreview.innerHTML = `
-                        <img src="${event.target.result}" alt="Logo">
+                        <img src="${logoBase64}" alt="Logo">
                         <div class="preview-name">${file.name}</div>
                     `;
                 };
@@ -512,8 +516,9 @@
             if (file) {
                 const reader = new FileReader();
                 reader.onload = (event) => {
+                    bannerBase64 = event.target.result;
                     bannerPreview.innerHTML = `
-                        <img src="${event.target.result}" alt="Banner">
+                        <img src="${bannerBase64}" alt="Banner">
                         <div class="preview-name">${file.name}</div>
                     `;
                 };
@@ -551,9 +556,9 @@
                 telefoneResponsavel: formData.get('telefoneResponsavel'),
                 emailResponsavel: formData.get('emailResponsavel'),
 
-                // Arquivos
-                logo: logoInput.files[0]?.name || '',
-                banner: bannerInput.files[0]?.name || '',
+                // Arquivos (Base64)
+                logo: logoBase64 || '',
+                banner: bannerBase64 || '',
                 dataCadastro: new Date().toISOString()
             };
 
