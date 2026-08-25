@@ -135,11 +135,51 @@
 
         @media (max-width: 768px) {
             .produtos-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 12px;
+            }
+
+            .produto {
+                padding: 12px;
             }
 
             .nome-loja {
                 font-size: 1.3em;
+            }
+
+            .categoria-titulo {
+                font-size: 1.2em;
+            }
+
+            .produto-nome {
+                font-size: 0.9em;
+            }
+
+            .produto-desc {
+                font-size: 0.8em;
+            }
+
+            .produto-preco {
+                font-size: 1em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .produtos-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                gap: 10px;
+            }
+
+            .produto {
+                padding: 10px;
+            }
+
+            .header {
+                padding: 20px 15px;
+            }
+
+            .cardapio-section {
+                padding: 15px;
             }
         }
     </style>
