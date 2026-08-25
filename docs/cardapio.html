@@ -438,10 +438,12 @@
             }
 
             .header {
+                flex-direction: row;
                 padding: 20px 20px 20px 100px;
                 margin-top: -40px;
                 align-items: center;
                 gap: 15px;
+                display: flex;
             }
 
             .avatar {
@@ -450,10 +452,13 @@
                 position: absolute;
                 left: 20px;
                 top: -30px;
+                flex-shrink: 0;
             }
 
             .header-info {
                 flex: 1;
+                display: flex;
+                flex-direction: column;
             }
 
             .nome-loja {
