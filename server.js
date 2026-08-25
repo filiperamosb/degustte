@@ -27,6 +27,14 @@ const PORT = process.env.PORT || 3000;
 const ACCESS_TOKEN = process.env.MERCADOPAGO_ACCESS_TOKEN;
 
 app.post('/api/create-preference', async (req, res) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+
   try {
     const { nomeEmpresa, email, valor, dados } = req.body;
 
@@ -93,6 +101,14 @@ app.post('/webhook', (req, res) => {
 });
 
 app.get('/api/check-payment', async (req, res) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+
   const reference = req.query.reference;
   console.log('Verificando pagamento:', reference);
 
