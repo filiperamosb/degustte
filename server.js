@@ -6,11 +6,16 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const app = express();
-app.use(cors());
+
+app.use(cors({
+  origin: ['https://www.degustte.com.br', 'http://localhost:8001', 'http://localhost:3000'],
+  credentials: true
+}));
+
 app.use(express.json());
 
-const PORT = 3000;
-const ACCESS_TOKEN = process.env.MERCADOPAGO_ACCESS_TOKEN || 'APP_USR-8018838157806850-082413-4f1e94a51f821e71f5e05a88b2ae4e8c-1234567890';
+const PORT = process.env.PORT || 3000;
+const ACCESS_TOKEN = process.env.MERCADOPAGO_ACCESS_TOKEN;
 
 app.post('/api/create-preference', async (req, res) => {
   try {
@@ -29,11 +34,11 @@ app.post('/api/create-preference', async (req, res) => {
       },
       external_reference: `degustte-${Date.now()}`,
       back_urls: {
-        success: 'http://localhost:8001/redirect.html',
-        failure: 'http://localhost:8001/erro.html',
-        pending: 'http://localhost:8001/pendente.html'
+        success: 'https://www.degustte.com.br/redirect.html',
+        failure: 'https://www.degustte.com.br/erro.html',
+        pending: 'https://www.degustte.com.br/pendente.html'
       },
-      notification_url: `http://localhost:${PORT}/webhook`
+      notification_url: 'https://degusttev-2--FilipeRamos.replit.app/webhook'
     };
 
     const response = await axios.post(
@@ -62,13 +67,11 @@ app.post('/api/create-preference', async (req, res) => {
   }
 });
 
-// Armazenar pagamentos aprovados em memória (simplificado)
 const approvedPayments = new Set();
 
 app.post('/webhook', (req, res) => {
   console.log('Webhook recebido:', req.body);
 
-  // Se for notificação de pagamento aprovado
   if (req.body.type === 'payment' && req.body.action === 'payment.created') {
     const reference = req.body.data?.id;
     if (reference) {
@@ -80,13 +83,11 @@ app.post('/webhook', (req, res) => {
   res.json({ status: 'received' });
 });
 
-// Endpoint para verificar status do pagamento
 app.get('/api/check-payment', async (req, res) => {
   const reference = req.query.reference;
   console.log('Verificando pagamento:', reference);
 
   try {
-    // Consultar API do MercadoPago para buscar pagamentos recentes
     const response = await axios.get(
       'https://api.mercadopago.com/v1/payments/search?sort=date_created&criteria=desc&limit=100',
       {
@@ -96,7 +97,6 @@ app.get('/api/check-payment', async (req, res) => {
       }
     );
 
-    // Procurar por pagamento com a descrição que enviamos
     const payments = response.data.results || [];
     const payment = payments.find(p =>
       p.description && p.description.includes(reference) && p.status === 'approved'
@@ -124,19 +124,7 @@ app.get('/api/check-payment', async (req, res) => {
   }
 });
 
-app.get('/sucesso', (req, res) => {
-  res.send('<h1>Pagamento Realizado com Sucesso!</h1>');
-});
-
-app.get('/erro', (req, res) => {
-  res.send('<h1>Pagamento Falhou</h1>');
-});
-
-app.get('/pendente', (req, res) => {
-  res.send('<h1>Pagamento Pendente</h1>');
-});
-
 app.listen(PORT, () => {
   console.log(`🚀 Servidor rodando na porta ${PORT}`);
-  console.log(`API disponível em http://localhost:${PORT}/api/create-preference`);
+  console.log(`API disponível em /api/create-preference`);
 });
