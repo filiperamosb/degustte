@@ -648,18 +648,26 @@
 
         function corrigirCaracteres(texto) {
             if (!texto) return texto;
-            // Corrigir acentos quebrados
             return texto
-                // Substituições específicas
-                .replace(/várias/g, 'várias')
-                .replace(/opções/g, 'opções')
                 .replace(/v@rias/gi, 'várias')
                 .replace(/op@@es/gi, 'opções')
-                // Caracteres individuais @
                 .replace(/\@\@/g, 'ç')
+                .replace(/pra@@o/gi, 'prato')
+                .replace(/c@@o/gi, 'caio')
+                .replace(/m@@/gi, 'mão')
+                .replace(/p@@/gi, 'pão')
+                .replace(/s@@/gi, 'são')
+                .replace(/caf@/gi, 'café')
+                .replace(/fran@o/gi, 'frango')
+                .replace(/suco/gi, 'suco')
+                .replace(/@@/g, 'ç')
                 .replace(/@/g, 'á')
-                // Caracteres ? (fallback)
-                .replace(/\?/g, 'á');
+                .replace(/\?/g, 'á')
+                .replace(/\^/g, 'ã')
+                .replace(/~/g, 'ã')
+                .replace(/`/g, 'à')
+                .replace(/´/g, 'é')
+                .replace(/¨/g, 'ö');
         }
 
         function renderizarCardapio(loja) {
@@ -744,9 +752,9 @@
             document.getElementById('destaquesSection').style.display = 'block';
             const html = destaques.map(p => `
                 <div class="destaque-item">
-                    ${p.imagem ? `<img src="${p.imagem}" class="destaque-img" alt="${p.nome}">` : '<div class="destaque-img" style="background:#e0e0e0;"></div>'}
+                    ${p.imagem ? `<img src="${p.imagem}" class="destaque-img" alt="${corrigirCaracteres(p.nome)}">` : '<div class="destaque-img" style="background:#e0e0e0;"></div>'}
                     <button class="destaque-like" onclick="toggleLike(event)">❤️</button>
-                    <div class="destaque-label">${p.nome.substring(0, 20)}</div>
+                    <div class="destaque-label">${corrigirCaracteres(p.nome).substring(0, 20)}</div>
                 </div>
             `).join('');
 
