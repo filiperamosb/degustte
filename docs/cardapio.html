@@ -17,7 +17,8 @@
             align-items: center;
             justify-content: center;
             height: 260px;
-            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+            background-size: cover;
+            background-position: center;
             color: white;
             font-size: 5em;
             font-weight: bold;
@@ -31,12 +32,19 @@
             padding: 0 20px;
         }
 
-        .banner-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+        .banner-section::before {
+            content: '';
             position: absolute;
-            opacity: 0.8;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 2;
+        }
+
+        .banner-img {
+            display: none;
         }
 
         .banner-text {
@@ -488,9 +496,10 @@
             <div class="nome-loja" id="nomeLoja">Carregando...</div>
             <div class="social-links">
                 <a href="#" class="social-btn" id="btnHome" style="display:none;" target="_blank">🏠</a>
+                <a href="#" class="social-btn" id="btnFacebook" style="display:none;" target="_blank">f</a>
                 <a href="#" class="social-btn instagram" id="btnInstagram" style="display:none;" target="_blank">📷</a>
                 <a href="#" class="social-btn whatsapp" id="btnWhatsapp" style="display:none;" target="_blank">💬</a>
-                <a href="#" class="social-btn" id="btnSearch" style="display:none;" onclick="return false">🔍</a>
+                <a href="#" class="social-btn" id="btnPhone" style="display:none;" onclick="return false">☎️</a>
                 <a href="#" class="avaliar-link" id="btnAvaliar">Avaliar ⭐</a>
             </div>
         </div>
@@ -558,10 +567,13 @@
                 }
 
                 if (lojaData.banner) {
-                    document.getElementById('bannerImg').src = lojaData.banner;
-                    document.getElementById('bannerImg').style.display = 'block';
+                    document.querySelector('.banner-section').style.backgroundImage = `url('${lojaData.banner}')`;
                 }
 
+                if (lojaData.facebook) {
+                    document.getElementById('btnFacebook').href = lojaData.facebook;
+                    document.getElementById('btnFacebook').style.display = 'inline-flex';
+                }
                 if (lojaData.instagram) {
                     document.getElementById('btnInstagram').href = lojaData.instagram;
                     document.getElementById('btnInstagram').style.display = 'inline-flex';
@@ -569,6 +581,8 @@
                 if (lojaData.whatsapp) {
                     document.getElementById('btnWhatsapp').href = 'https://wa.me/' + lojaData.whatsapp.replace(/\D/g, '');
                     document.getElementById('btnWhatsapp').style.display = 'inline-flex';
+                    document.getElementById('btnPhone').href = 'tel:' + lojaData.whatsapp.replace(/\D/g, '');
+                    document.getElementById('btnPhone').style.display = 'inline-flex';
                 }
 
                 document.getElementById('btnHome').href = `/${slug}`;
