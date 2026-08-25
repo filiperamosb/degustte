@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - DeGustte Admin</title>
+    <link rel="stylesheet" href="/admin/css/admin.css">
+    <style>
+        .menu-group-title {
+            padding: 15px 20px 8px;
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            font-weight: 600;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">DeGustte</div>
+            <ul class="sidebar-menu">
+                <li class="menu-group-title">Menu</li>
+                <li><a href="#dashboard" class="menu-link ativo" data-page="dashboard">📊 Dashboard</a></li>
+                <li><a href="#categorias" class="menu-link" data-page="categorias">📂 Categorias</a></li>
+                <li><a href="#produtos" class="menu-link" data-page="produtos">🍽️ Produtos</a></li>
+                <li><a href="#configuracoes" class="menu-link" data-page="configuracoes">⚙️ Configurações</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main -->
+        <div class="main">
+            <!-- Topbar -->
+            <div class="topbar">
+                <div class="topbar-title" id="pageTitle">Dashboard</div>
+                <div class="topbar-actions">
+                    <div class="user-info">
+                        <div class="avatar" id="userAvatar">A</div>
+                        <div>
+                            <div style="font-size: 12px;">Admin</div>
+                            <div style="font-size: 11px; color: var(--text-secondary);">admin@degustte.com</div>
+                        </div>
+                    </div>
+                    <button class="logout-btn" onclick="logout()">Sair</button>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="content">
+                <!-- Dashboard Page -->
+                <div id="dashboard" class="page ativo">
+                    <div class="grid">
+                        <div class="stat-card">
+                            <div class="stat-label">Total de Produtos</div>
+                            <div class="stat-value" id="totalProdutos">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Categorias Ativas</div>
+                            <div class="stat-value" id="totalCategorias">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Status</div>
+                            <div class="stat-value" style="color: var(--success);">Ativo</div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">Últimos Produtos</div>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Nome</th>
+                                        <th>Categoria</th>
+                                        <th>Preço</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ultimosProdutos">
+                                    <tr>
+                                        <td colspan="4" style="text-align: center; color: var(--text-secondary);">Nenhum produto cadastrado</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Categorias Page -->
+                <div id="categorias" class="page">
+                    <div class="card">
+                        <div class="card-title">Gerenciar Categorias</div>
+                        <button class="btn btn-primary" onclick="openCategoriaModal()">+ Nova Categoria</button>
+
+                        <div class="table-container" style="margin-top: 20px;">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Nome</th>
+                                        <th>Descrição</th>
+                                        <th>Produtos</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="categoriasList">
+                                    <tr>
+                                        <td colspan="4" style="text-align: center; color: var(--text-secondary);">Nenhuma categoria cadastrada</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Produtos Page -->
+                <div id="produtos" class="page">
+                    <div class="card">
+                        <div class="card-title">Gerenciar Produtos</div>
+                        <button class="btn btn-primary" onclick="openProdutoModal()">+ Novo Produto</button>
+
+                        <div class="table-container" style="margin-top: 20px;">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Nome</th>
+                                        <th>Categoria</th>
+                                        <th>Preço</th>
+                                        <th>Status</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="produtosList">
+                                    <tr>
+                                        <td colspan="5" style="text-align: center; color: var(--text-secondary);">Nenhum produto cadastrado</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Configurações Page -->
+                <div id="configuracoes" class="page">
+                    <div class="card">
+                        <div class="card-title">Configurações da Loja</div>
+
+                        <div class="form-group">
+                            <label>Nome da Loja</label>
+                            <input type="text" id="nomeLoja" placeholder="Ex: Meu Restaurante">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Descrição</label>
+                            <textarea id="descricaoLoja" placeholder="Descrição do seu estabelecimento"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Cor Principal</label>
+                            <input type="color" id="corPrincipal" value="#FF6B35">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Telefone</label>
+                            <input type="tel" id="telefoneLoja" placeholder="(11) 99999-9999">
+                        </div>
+
+                        <button class="btn btn-primary" onclick="salvarConfiguracoes()">Salvar Configurações</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Categoria -->
+    <div id="categoriaModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span id="categoriaModalTitle">Nova Categoria</span>
+                <button class="close-modal" onclick="closeCategoriaModal()">×</button>
+            </div>
+            <div class="form-group">
+                <label>Nome da Categoria</label>
+                <input type="text" id="categoriaNome" placeholder="Ex: Entradas">
+            </div>
+            <div class="form-group">
+                <label>Descrição</label>
+                <textarea id="categoriaDescricao" placeholder="Descrição da categoria"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeCategoriaModal()">Cancelar</button>
+                <button class="btn btn-primary" onclick="salvarCategoria()">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Produto -->
+    <div id="produtoModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span id="produtoModalTitle">Novo Produto</span>
+                <button class="close-modal" onclick="closeProdutoModal()">×</button>
+            </div>
+            <div class="form-group">
+                <label>Nome do Produto</label>
+                <input type="text" id="produtoNome" placeholder="Ex: Pizza Margherita">
+            </div>
+            <div class="form-group">
+                <label>Categoria</label>
+                <select id="produtoCategoria"></select>
+            </div>
+            <div class="form-group">
+                <label>Descrição</label>
+                <textarea id="produtoDescricao" placeholder="Descrição do produto"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Preço</label>
+                <input type="number" id="produtoPreco" placeholder="0.00" step="0.01">
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="produtoDisponivel" checked> Disponível
+                </label>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeProdutoModal()">Cancelar</button>
+                <button class="btn btn-primary" onclick="salvarProduto()">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let categoriaEditId = null;
+        let produtoEditId = null;
+
+        // Inicializar
+        window.addEventListener('load', () => {
+            checkAuth();
+            carregarDados();
+            inicializarMenu();
+        });
+
+        // Auth
+        function checkAuth() {
+            const admin = localStorage.getItem('adminLogado');
+            if (!admin) {
+                window.location.href = '/admin/login.html';
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('adminLogado');
+            window.location.href = '/admin/login.html';
+        }
+
+        // Menu
+        function inicializarMenu() {
+            document.querySelectorAll('.menu-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const page = link.dataset.page;
+                    mostrarPagina(page);
+                });
+            });
+        }
+
+        function mostrarPagina(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('ativo'));
+            document.querySelectorAll('.menu-link').forEach(l => l.classList.remove('ativo'));
+
+            document.getElementById(page).classList.add('ativo');
+            document.querySelector(`[data-page="${page}"]`).classList.add('ativo');
+
+            const titles = {
+                dashboard: 'Dashboard',
+                categorias: 'Categorias',
+                produtos: 'Produtos',
+                configuracoes: 'Configurações'
+            };
+
+            document.getElementById('pageTitle').textContent = titles[page];
+        }
+
+        // Dados
+        function carregarDados() {
+            const dados = JSON.parse(localStorage.getItem('cardapioData') || '{"categorias":[],"produtos":[]}');
+            atualizarDashboard(dados);
+            atualizarCategoriasList(dados.categorias);
+            atualizarProdutosList(dados.produtos);
+            atualizarSelectCategorias(dados.categorias);
+        }
+
+        function salvarDados(dados) {
+            localStorage.setItem('cardapioData', JSON.stringify(dados));
+            carregarDados();
+        }
+
+        // Dashboard
+        function atualizarDashboard(dados) {
+            document.getElementById('totalProdutos').textContent = dados.produtos.length;
+            document.getElementById('totalCategorias').textContent = dados.categorias.length;
+
+            const ultimosProdutos = dados.produtos.slice(-5).reverse();
+            const html = ultimosProdutos.length > 0
+                ? ultimosProdutos.map(p => `
+                    <tr>
+                        <td>${p.nome}</td>
+                        <td>${dados.categorias.find(c => c.id === p.categoriaId)?.nome || '-'}</td>
+                        <td>R$ ${p.preco.toFixed(2)}</td>
+                        <td><button class="btn btn-sm btn-secondary" onclick="editarProduto('${p.id}')">Editar</button></td>
+                    </tr>
+                `).join('')
+                : '<tr><td colspan="4" style="text-align: center; color: var(--text-secondary);">Nenhum produto cadastrado</td></tr>';
+
+            document.getElementById('ultimosProdutos').innerHTML = html;
+        }
+
+        // Categorias
+        function openCategoriaModal() {
+            categoriaEditId = null;
+            document.getElementById('categoriaNome').value = '';
+            document.getElementById('categoriaDescricao').value = '';
+            document.getElementById('categoriaModalTitle').textContent = 'Nova Categoria';
+            document.getElementById('categoriaModal').classList.add('ativo');
+        }
+
+        function closeCategoriaModal() {
+            document.getElementById('categoriaModal').classList.remove('ativo');
+        }
+
+        function salvarCategoria() {
+            const dados = JSON.parse(localStorage.getItem('cardapioData') || '{"categorias":[],"produtos":[]}');
+            const nome = document.getElementById('categoriaNome').value.trim();
+            const descricao = document.getElementById('categoriaDescricao').value.trim();
+
+            if (!nome) {
+                alert('Nome da categoria é obrigatório');
+                return;
+            }
+
+            if (categoriaEditId) {
+                const cat = dados.categorias.find(c => c.id === categoriaEditId);
+                if (cat) {
+                    cat.nome = nome;
+                    cat.descricao = descricao;
+                }
+            } else {
+                dados.categorias.push({
+                    id: Date.now().toString(),
+                    nome,
+                    descricao
+                });
+            }
+
+            salvarDados(dados);
+            closeCategoriaModal();
+        }
+
+        function atualizarCategoriasList(categorias) {
+            const html = categorias.length > 0
+                ? categorias.map(cat => `
+                    <tr>
+                        <td>${cat.nome}</td>
+                        <td>${cat.descricao}</td>
+                        <td>0</td>
+                        <td>
+                            <button class="btn btn-sm btn-secondary" onclick="editarCategoria('${cat.id}')">Editar</button>
+                            <button class="btn btn-sm btn-danger" onclick="deletarCategoria('${cat.id}')">Deletar</button>
+                        </td>
+                    </tr>
+                `).join('')
+                : '<tr><td colspan="4" style="text-align: center; color: var(--text-secondary);">Nenhuma categoria cadastrada</td></tr>';
+
+            document.getElementById('categoriasList').innerHTML = html;
+        }
+
+        function editarCategoria(id) {
+            const dados = JSON.parse(localStorage.getItem('cardapioData') || '{"categorias":[],"produtos":[]}');
+            const cat = dados.categorias.find(c => c.id === id);
+            if (cat) {
+                categoriaEditId = id;
+                document.getElementById('categoriaNome').value = cat.nome;
+                document.getElementById('categoriaDescricao').value = cat.descricao;
+                document.getElementById('categoriaModalTitle').textContent = 'Editar Categoria';
+                document.getElementById('categoriaModal').classList.add('ativo');
+            }
+        }
+
+        function deletarCategoria(id) {
+            if (confirm('Tem certeza que deseja deletar esta categoria?')) {
+                const dados = JSON.parse(localStorage.getItem('cardapioData') || '{"categorias":[],"produtos":[]}');
+                dados.categorias = dados.categorias.filter(c => c.id !== id);
+                salvarDados(dados);
+            }
+        }
+
+        function atualizarSelectCategorias(categorias) {
+            const select = document.getElementById('produtoCategoria');
+            select.innerHTML = categorias.map(cat => `<option value="${cat.id}">${cat.nome}</option>`).join('');
+        }
+
+        // Produtos
+        function openProdutoModal() {
+            produtoEditId = null;
+            document.getElementById('produtoNome').value = '';
+            document.getElementById('produtoDescricao').value = '';
+            document.getElementById('produtoPreco').value = '';
+            document.getElementById('produtoDisponivel').checked = true;
+            document.getElementById('produtoModalTitle').textContent = 'Novo Produto';
+            document.getElementById('produtoModal').classList.add('ativo');
+        }
+
+        function closeProdutoModal() {
+            document.getElementById('produtoModal').classList.remove('ativo');
+        }
+
+        function salvarProduto() {
+            const dados = JSON.parse(localStorage.getItem('cardapioData') || '{"categorias":[],"produtos":[]}');
+            const nome = document.getElementById('produtoNome').value.trim();
+            const categoriaId = document.getElementById('produtoCategoria').value;
+            const descricao = document.getElementById('produtoDescricao').value.trim();
+            const preco = parseFloat(document.getElementById('produtoPreco').value);
+            const disponivel = document.getElementById('produtoDisponivel').checked;
+
+            if (!nome || !preco) {
+                alert('Nome e preço do produto são obrigatórios');
+                return;
+            }
+
+            if (produtoEditId) {
+                const prod = dados.produtos.find(p => p.id === produtoEditId);
+                if (prod) {
+                    prod.nome = nome;
+                    prod.categoriaId = categoriaId;
+                    prod.descricao = descricao;
+                    prod.preco = preco;
+                    prod.disponivel = disponivel;
+                }
+            } else {
+                dados.produtos.push({
+                    id: Date.now().toString(),
+                    nome,
+                    categoriaId,
+                    descricao,
+                    preco,
+                    disponivel
+                });
+            }
+
+            salvarDados(dados);
+            closeProdutoModal();
+        }
+
+        function atualizarProdutosList(produtos) {
+            const dados = JSON.parse(localStorage.getItem('cardapioData') || '{"categorias":[],"produtos":[]}');
+            const html = produtos.length > 0
+                ? produtos.map(prod => `
+                    <tr>
+                        <td>${prod.nome}</td>
+                        <td>${dados.categorias.find(c => c.id === prod.categoriaId)?.nome || '-'}</td>
+                        <td>R$ ${prod.preco.toFixed(2)}</td>
+                        <td>${prod.disponivel ? '✓ Ativo' : '✗ Inativo'}</td>
+                        <td>
+                            <button class="btn btn-sm btn-secondary" onclick="editarProduto('${prod.id}')">Editar</button>
+                            <button class="btn btn-sm btn-danger" onclick="deletarProduto('${prod.id}')">Deletar</button>
+                        </td>
+                    </tr>
+                `).join('')
+                : '<tr><td colspan="5" style="text-align: center; color: var(--text-secondary);">Nenhum produto cadastrado</td></tr>';
+
+            document.getElementById('produtosList').innerHTML = html;
+        }
+
+        function editarProduto(id) {
+            const dados = JSON.parse(localStorage.getItem('cardapioData') || '{"categorias":[],"produtos":[]}');
+            const prod = dados.produtos.find(p => p.id === id);
+            if (prod) {
+                produtoEditId = id;
+                document.getElementById('produtoNome').value = prod.nome;
+                document.getElementById('produtoCategoria').value = prod.categoriaId;
+                document.getElementById('produtoDescricao').value = prod.descricao;
+                document.getElementById('produtoPreco').value = prod.preco;
+                document.getElementById('produtoDisponivel').checked = prod.disponivel;
+                document.getElementById('produtoModalTitle').textContent = 'Editar Produto';
+                document.getElementById('produtoModal').classList.add('ativo');
+            }
+        }
+
+        function deletarProduto(id) {
+            if (confirm('Tem certeza que deseja deletar este produto?')) {
+                const dados = JSON.parse(localStorage.getItem('cardapioData') || '{"categorias":[],"produtos":[]}');
+                dados.produtos = dados.produtos.filter(p => p.id !== id);
+                salvarDados(dados);
+            }
+        }
+
+        // Configurações
+        function salvarConfiguracoes() {
+            const lojaConfig = {
+                nomeLoja: document.getElementById('nomeLoja').value,
+                descricaoLoja: document.getElementById('descricaoLoja').value,
+                corPrincipal: document.getElementById('corPrincipal').value,
+                telefoneLoja: document.getElementById('telefoneLoja').value
+            };
+
+            localStorage.setItem('lojaConfig', JSON.stringify(lojaConfig));
+            alert('Configurações salvas com sucesso!');
+        }
+
+        // Carregar configurações ao abrir
+        window.addEventListener('load', () => {
+            const config = JSON.parse(localStorage.getItem('lojaConfig') || '{}');
+            if (config.nomeLoja) {
+                document.getElementById('nomeLoja').value = config.nomeLoja;
+                document.getElementById('descricaoLoja').value = config.descricaoLoja;
+                document.getElementById('corPrincipal').value = config.corPrincipal;
+                document.getElementById('telefoneLoja').value = config.telefoneLoja;
+            }
+        });
+    </script>
+</body>
+</html>
