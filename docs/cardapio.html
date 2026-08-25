@@ -576,6 +576,32 @@
         </div>
     </div>
 
+    <!-- Modal Produto -->
+    <div id="modalProduto" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:999; overflow-y:auto;">
+        <div style="background:white; margin:50px auto; padding:30px; border-radius:10px; max-width:500px; width:90%;">
+            <button onclick="fecharModalProduto()" style="float:right; background:none; border:none; font-size:24px; cursor:pointer;">✕</button>
+            <h2 id="modalProdNome" style="color:#27ae60; margin-bottom:10px;"></h2>
+            <p id="modalProdDesc" style="color:#666; margin-bottom:20px; line-height:1.5;"></p>
+
+            <div style="background:#f9f9f9; padding:15px; border-radius:8px; margin-bottom:20px;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                    <span style="font-weight:bold;">Preço:</span>
+                    <span id="modalProdPreco" style="color:#27ae60; font-weight:bold; font-size:1.2em;"></span>
+                </div>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <label style="font-weight:bold;">Quantidade:</label>
+                    <button onclick="diminuirQuantidade()" style="background:#27ae60; color:white; border:none; width:30px; height:30px; border-radius:5px; cursor:pointer;">-</button>
+                    <span id="modalQuantidade" style="font-weight:bold; font-size:1.1em; min-width:30px; text-align:center;">1</span>
+                    <button onclick="aumentarQuantidade()" style="background:#27ae60; color:white; border:none; width:30px; height:30px; border-radius:5px; cursor:pointer;">+</button>
+                </div>
+            </div>
+
+            <div id="adicionaisContainer" style="margin-bottom:20px;"></div>
+
+            <button onclick="adicionarNaSacola()" style="width:100%; background:#27ae60; color:white; border:none; padding:15px; border-radius:8px; font-size:1.1em; font-weight:bold; cursor:pointer;">🛒 Adicionar à Sacola</button>
+        </div>
+    </div>
+
     <script>
         const API_URL = 'https://api.degustte.com.br/api';
         let slug = null;
@@ -701,12 +727,13 @@
                         <div class="categoria-titulo">${corrigirCaracteres(cat.nome).toUpperCase()}</div>
                         <div class="produtos-grid">
                             ${produtos.map(p => `
-                                <div class="produto">
+                                <div class="produto" onclick="abrirModalProduto('${p.id}')" style="cursor:pointer;">
                                     <div class="produto-info">
                                         <div class="produto-nome">${corrigirCaracteres(p.nome)}</div>
                                         ${p.descricao ? `<div class="produto-desc">${corrigirCaracteres(p.descricao)}</div>` : ''}
                                         <div class="produto-footer">
-                                            <div class="produto-preco">R$ ${parseFloat(p.preco).toFixed(2)}</div>
+                                            <div class="produto-preco">R$ ${parseFloat(p.preco).toFixed(2)}
+                                            ${p.desconto ? ` <span style="color:#e74c3c; font-size:0.9em;">-${p.desconto}%</span>` : ''}</div>
                                             <div class="produto-like-count"><span>0</span> ❤️</div>
                                         </div>
                                     </div>
@@ -773,6 +800,66 @@
             `).join('');
 
             document.getElementById('destaquesList').innerHTML = html;
+        }
+
+        let produtoSelecionado = null;
+        let quantidadeModal = 1;
+        let sacola = JSON.parse(localStorage.getItem('sacola')) || [];
+
+        function abrirModalProduto(produtoId) {
+            produtoSelecionado = lojaData.cardapio.produtos.find(p => p.id === produtoId);
+            if (!produtoSelecionado) return;
+
+            quantidadeModal = 1;
+            document.getElementById('modalProdNome').textContent = corrigirCaracteres(produtoSelecionado.nome);
+            document.getElementById('modalProdDesc').textContent = produtoSelecionado.descricao ? corrigirCaracteres(produtoSelecionado.descricao) : 'Sem descrição';
+
+            const preco = parseFloat(produtoSelecionado.preco).toFixed(2);
+            const desconto = produtoSelecionado.desconto ? (preco * (1 - produtoSelecionado.desconto / 100)).toFixed(2) : preco;
+            document.getElementById('modalProdPreco').textContent = `R$ ${desconto}`;
+
+            document.getElementById('modalQuantidade').textContent = '1';
+
+            // Adicionais (placeholder por enquanto)
+            document.getElementById('adicionaisContainer').innerHTML = '';
+
+            document.getElementById('modalProduto').style.display = 'block';
+        }
+
+        function fecharModalProduto() {
+            document.getElementById('modalProduto').style.display = 'none';
+            produtoSelecionado = null;
+        }
+
+        function aumentarQuantidade() {
+            quantidadeModal++;
+            document.getElementById('modalQuantidade').textContent = quantidadeModal;
+        }
+
+        function diminuirQuantidade() {
+            if (quantidadeModal > 1) {
+                quantidadeModal--;
+                document.getElementById('modalQuantidade').textContent = quantidadeModal;
+            }
+        }
+
+        function adicionarNaSacola() {
+            if (!produtoSelecionado) return;
+
+            const item = {
+                id: produtoSelecionado.id,
+                nome: produtoSelecionado.nome,
+                preco: parseFloat(produtoSelecionado.preco),
+                desconto: produtoSelecionado.desconto || 0,
+                quantidade: quantidadeModal,
+                adicionais: []
+            };
+
+            sacola.push(item);
+            localStorage.setItem('sacola', JSON.stringify(sacola));
+
+            fecharModalProduto();
+            alert(`${item.quantidade}x ${corrigirCaracteres(item.nome)} adicionado à sacola!`);
         }
 
         setInterval(carregarCardapio, 10000);
