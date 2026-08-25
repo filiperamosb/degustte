@@ -269,6 +269,36 @@
             font-weight: 700;
         }
 
+        .marquee-container {
+            overflow: hidden;
+            background: #1a1a1a;
+            padding: 20px 0;
+            margin: 20px 0;
+        }
+
+        .marquee {
+            display: flex;
+            animation: marquee 15s linear infinite;
+            white-space: nowrap;
+        }
+
+        .marquee-text {
+            font-size: 48px;
+            font-weight: 800;
+            color: rgba(255, 255, 255, 0.1);
+            padding: 0 40px;
+            letter-spacing: 20px;
+        }
+
+        @keyframes marquee {
+            0% {
+                transform: translateX(100%);
+            }
+            100% {
+                transform: translateX(-100%);
+            }
+        }
+
         .restaurant-logos {
             display: flex;
             justify-content: center;
@@ -781,7 +811,15 @@
 
 <!-- Restaurants Section -->
     <section class="restaurants">
-        <h2>Estamos presentes nos melhores restaurantes do Brasil</h2>
+        <div class="marquee-container">
+            <div class="marquee">
+                <span class="marquee-text">DeGustte</span>
+                <span class="marquee-text">DeGustte</span>
+                <span class="marquee-text">DeGustte</span>
+                <span class="marquee-text">DeGustte</span>
+            </div>
+        </div>
+        <h2>TENHA SEU COMÉRCIO AQUI!!!!</h2>
         <div class="restaurant-logos">
             <div class="logo-box">Restaurant 1</div>
             <div class="logo-box">Restaurant 2</div>
