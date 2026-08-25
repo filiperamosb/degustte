@@ -523,6 +523,15 @@
         function corrigirCaracteres(texto) {
             if (!texto) return texto;
             return texto
+                .replace(/v@rias/gi, 'várias')
+                .replace(/op@@es/gi, 'opções')
+                .replace(/a@/gi, 'ã')
+                .replace(/e@/gi, 'é')
+                .replace(/i@/gi, 'í')
+                .replace(/o@/gi, 'ó')
+                .replace(/u@/gi, 'ú')
+                .replace(/@@/g, 'ç')
+                .replace(/@/g, 'á')
                 .replace(/v\?rias/gi, 'várias')
                 .replace(/op\?@s/gi, 'opções')
                 .replace(/a\?/gi, 'ã')
@@ -530,7 +539,6 @@
                 .replace(/i\?/gi, 'í')
                 .replace(/o\?/gi, 'ó')
                 .replace(/u\?/gi, 'ú')
-                .replace(/@@/g, 'ç')
                 .replace(/\?/g, 'á');
         }
 
