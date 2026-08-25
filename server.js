@@ -33,6 +33,7 @@ app.post('/api/create-preference', async (req, res) => {
         failure: 'http://localhost:8001/erro.html',
         pending: 'http://localhost:8001/pendente.html'
       },
+      auto_return: 'approved',
       notification_url: `http://localhost:${PORT}/webhook`
     };
 
