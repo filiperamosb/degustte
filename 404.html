@@ -10,8 +10,7 @@
 
         if (segments.length > 0 && !segments[segments.length - 1].includes('.')) {
             const slug = segments[segments.length - 1];
-            sessionStorage.setItem('empresaSlug', slug);
-            window.location.href = '/empresa.html';
+            window.location.href = '/empresa.html?slug=' + encodeURIComponent(slug);
         } else {
             window.location.href = '/';
         }
