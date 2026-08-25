@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Empresas - DeGustte Admin</title>
+    <link rel="stylesheet" href="/admin/css/admin.css">
+    <style>
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-pendente {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-autorizada {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-ativa {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status-bloqueada {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .empresa-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .empresa-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .empresa-info h3 {
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .empresa-info p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .empresa-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .modal-content {
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .revisao-field {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: var(--bg-light);
+            border-radius: 6px;
+        }
+
+        .revisao-label {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+
+        .revisao-valor {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .input-edit {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .input-edit:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">DeGustte</div>
+            <ul class="sidebar-menu">
+                <li class="menu-group-title">Menu</li>
+                <li><a href="/admin/dashboard.html">📊 Dashboard</a></li>
+                <li><a href="/admin/empresas.html" class="ativo">🏢 Empresas</a></li>
+                <li><a href="/admin/dashboard.html">📂 Categorias</a></li>
+                <li><a href="/admin/dashboard.html">🍽️ Produtos</a></li>
+                <li><a href="/admin/dashboard.html">⚙️ Configurações</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main -->
+        <div class="main">
+            <!-- Topbar -->
+            <div class="topbar">
+                <div class="topbar-title">Gerenciar Empresas</div>
+                <div class="topbar-actions">
+                    <div class="user-info">
+                        <div class="avatar">A</div>
+                        <div>
+                            <div style="font-size: 12px;">Admin</div>
+                            <div style="font-size: 11px; color: var(--text-secondary);">admin@degustte.com</div>
+                        </div>
+                    </div>
+                    <button class="logout-btn" onclick="logout()">Sair</button>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="content">
+                <div class="card">
+                    <div class="card-title">Empresas Criadas</div>
+
+                    <div style="margin-bottom: 20px;">
+                        <input
+                            type="text"
+                            id="searchInput"
+                            placeholder="🔍 Buscar por nome, email ou CNPJ..."
+                            style="width: 100%; padding: 10px; border: 2px solid var(--border); border-radius: 6px; font-size: 14px;"
+                        >
+                    </div>
+
+                    <div id="empresasList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Revisão -->
+    <div id="revisaoModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span id="revisaoTitle">Revisar Empresa</span>
+                <button class="close-modal" onclick="closeRevisao()">×</button>
+            </div>
+
+            <div id="revisaoContent"></div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeRevisao()">Fechar</button>
+                <button class="btn btn-danger" id="btnBlocar" style="display:none;" onclick="bloquearEmpresa()">Bloquear</button>
+                <button class="btn btn-primary" id="btnAutorizar" onclick="autorizarEmpresa()">Autorizar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let empresaAtual = null;
+
+        window.addEventListener('load', () => {
+            checkAuth();
+            carregarEmpresas();
+        });
+
+        function checkAuth() {
+            const admin = localStorage.getItem('adminLogado');
+            if (!admin) {
+                window.location.href = '/admin/login.html';
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('adminLogado');
+            window.location.href = '/admin/login.html';
+        }
+
+        function carregarEmpresas() {
+            const empresas = JSON.parse(localStorage.getItem('empresas') || '[]');
+            renderizarEmpresas(empresas);
+
+            // Busca
+            document.getElementById('searchInput').addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase();
+                const filtradas = empresas.filter(emp =>
+                    emp.nomeEmpresa.toLowerCase().includes(query) ||
+                    emp.email.toLowerCase().includes(query) ||
+                    emp.cnpj.includes(query)
+                );
+                renderizarEmpresas(filtradas);
+            });
+        }
+
+        function renderizarEmpresas(empresas) {
+            const html = empresas.length > 0
+                ? empresas.map(emp => `
+                    <div class="empresa-card">
+                        <div class="empresa-info">
+                            <h3>${emp.nomeEmpresa}</h3>
+                            <p>📧 ${emp.email}</p>
+                            <p>📱 ${emp.telefone}</p>
+                            <p>🏷️ ${emp.cnpj}</p>
+                            <p>📋 Plano: <strong>${emp.plano}</strong></p>
+                        </div>
+                        <div class="empresa-actions">
+                            <span class="status-badge status-${emp.status}">${statusLabel(emp.status)}</span>
+                            <button class="btn btn-sm btn-secondary" onclick="abrirRevisao('${emp.id}')">Revisar</button>
+                            ${emp.status === 'autorizada' || emp.status === 'ativa'
+                                ? `<button class="btn btn-sm btn-primary" onclick="abrirPainelEmpresa('${emp.id}')">Painel</button>`
+                                : ''
+                            }
+                        </div>
+                    </div>
+                `).join('')
+                : '<p style="text-align: center; color: var(--text-secondary); padding: 40px;">Nenhuma empresa cadastrada</p>';
+
+            document.getElementById('empresasList').innerHTML = html;
+        }
+
+        function statusLabel(status) {
+            const labels = {
+                'pendente_revisao': '⏳ Pendente',
+                'autorizada': '✓ Autorizada',
+                'ativa': '🟢 Ativa',
+                'bloqueada': '❌ Bloqueada'
+            };
+            return labels[status] || status;
+        }
+
+        function abrirRevisao(id) {
+            const empresas = JSON.parse(localStorage.getItem('empresas') || '[]');
+            const empresa = empresas.find(e => e.id === id);
+
+            if (!empresa) return;
+
+            empresaAtual = empresa;
+
+            const content = `
+                <div class="revisao-field">
+                    <div class="revisao-label">Nome da Empresa</div>
+                    <input type="text" class="input-edit" id="edit-nome" value="${empresa.nomeEmpresa}">
+                </div>
+
+                <div class="revisao-field">
+                    <div class="revisao-label">Email Responsável</div>
+                    <input type="email" class="input-edit" id="edit-email" value="${empresa.email}">
+                </div>
+
+                <div class="revisao-field">
+                    <div class="revisao-label">Telefone Responsável</div>
+                    <input type="tel" class="input-edit" id="edit-telefone" value="${empresa.telefone}">
+                </div>
+
+                <div class="revisao-field">
+                    <div class="revisao-label">CNPJ</div>
+                    <input type="text" class="input-edit" id="edit-cnpj" value="${empresa.cnpj}">
+                </div>
+
+                <div class="revisao-field">
+                    <div class="revisao-label">Tipo de Estabelecimento</div>
+                    <input type="text" class="input-edit" id="edit-tipo" value="${empresa.tipo}">
+                </div>
+
+                <div class="revisao-field">
+                    <div class="revisao-label">Nome Responsável</div>
+                    <input type="text" class="input-edit" id="edit-nomeResp" value="${empresa.nomeResponsavel}">
+                </div>
+
+                <div class="revisao-field">
+                    <div class="revisao-label">CPF Responsável</div>
+                    <input type="text" class="input-edit" id="edit-cpf" value="${empresa.cpf}">
+                </div>
+
+                <div class="revisao-field">
+                    <div class="revisao-label">URL Personalizada</div>
+                    <input type="text" class="input-edit" id="edit-slug" value="${empresa.slug}">
+                    <small style="color: var(--text-secondary);">degustte.com.br/<strong>${empresa.slug}</strong></small>
+                </div>
+
+                <div class="revisao-field">
+                    <div class="revisao-label">Plano</div>
+                    <div class="revisao-valor">${empresa.plano}</div>
+                </div>
+
+                <div class="revisao-field">
+                    <div class="revisao-label">Status</div>
+                    <div class="revisao-valor">${statusLabel(empresa.status)}</div>
+                </div>
+
+                <div class="revisao-field">
+                    <div class="revisao-label">Data de Cadastro</div>
+                    <div class="revisao-valor">${new Date(empresa.dataCadastro).toLocaleString('pt-BR')}</div>
+                </div>
+            `;
+
+            document.getElementById('revisaoContent').innerHTML = content;
+            document.getElementById('revisaoTitle').textContent = `Revisar: ${empresa.nomeEmpresa}`;
+
+            // Mostrar/esconder botões de acordo com status
+            const btnAutorizar = document.getElementById('btnAutorizar');
+            const btnBlocar = document.getElementById('btnBlocar');
+
+            if (empresa.status === 'pendente_revisao') {
+                btnAutorizar.style.display = 'inline-block';
+                btnBlocar.style.display = 'inline-block';
+                btnAutorizar.textContent = 'Autorizar';
+            } else if (empresa.status === 'autorizada' || empresa.status === 'ativa') {
+                btnAutorizar.style.display = 'inline-block';
+                btnBlocar.style.display = 'inline-block';
+                btnAutorizar.textContent = 'Ir para Painel';
+                btnAutorizar.onclick = () => abrirPainelEmpresa(empresa.id);
+                btnBlocar.textContent = 'Bloquear';
+            }
+
+            document.getElementById('revisaoModal').classList.add('ativo');
+        }
+
+        function autorizarEmpresa() {
+            if (!empresaAtual) return;
+
+            const empresas = JSON.parse(localStorage.getItem('empresas') || '[]');
+            const index = empresas.findIndex(e => e.id === empresaAtual.id);
+
+            if (index !== -1) {
+                // Atualizar dados
+                empresas[index].nomeEmpresa = document.getElementById('edit-nome').value;
+                empresas[index].email = document.getElementById('edit-email').value;
+                empresas[index].telefone = document.getElementById('edit-telefone').value;
+                empresas[index].cnpj = document.getElementById('edit-cnpj').value;
+                empresas[index].tipo = document.getElementById('edit-tipo').value;
+                empresas[index].nomeResponsavel = document.getElementById('edit-nomeResp').value;
+                empresas[index].cpf = document.getElementById('edit-cpf').value;
+                empresas[index].slug = document.getElementById('edit-slug').value;
+
+                empresas[index].status = 'autorizada';
+                empresas[index].dataAutorizacao = new Date().toISOString();
+
+                localStorage.setItem('empresas', JSON.stringify(empresas));
+
+                alert(`✅ Empresa "${empresas[index].nomeEmpresa}" autorizada!\nURL: degustte.com.br/${empresas[index].slug}`);
+
+                closeRevisao();
+                carregarEmpresas();
+            }
+        }
+
+        function bloquearEmpresa() {
+            if (!empresaAtual) return;
+
+            if (!confirm('Tem certeza que deseja bloquear esta empresa?')) return;
+
+            const empresas = JSON.parse(localStorage.getItem('empresas') || '[]');
+            const index = empresas.findIndex(e => e.id === empresaAtual.id);
+
+            if (index !== -1) {
+                empresas[index].status = 'bloqueada';
+                localStorage.setItem('empresas', JSON.stringify(empresas));
+
+                alert('Empresa bloqueada!');
+                closeRevisao();
+                carregarEmpresas();
+            }
+        }
+
+        function abrirPainelEmpresa(id) {
+            const empresas = JSON.parse(localStorage.getItem('empresas') || '[]');
+            const empresa = empresas.find(e => e.id === id);
+
+            if (empresa) {
+                localStorage.setItem('empresaAtualId', empresa.id);
+                window.location.href = `/admin/empresa-painel.html?id=${empresa.id}`;
+            }
+        }
+
+        function closeRevisao() {
+            document.getElementById('revisaoModal').classList.remove('ativo');
+            empresaAtual = null;
+        }
+    </script>
+</body>
+</html>

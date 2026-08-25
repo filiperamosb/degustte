@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Empresa - DeGustte</title>
+    <link rel="stylesheet" href="/admin/css/admin.css">
+    <style>
+        .empresa-header {
+            background: linear-gradient(135deg, #FF6B35 0%, #E74C3C 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .empresa-header h1 {
+            margin: 0 0 10px 0;
+            color: white;
+        }
+
+        .empresa-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+            font-size: 13px;
+        }
+
+        .empresa-info-item {
+            background: rgba(255,255,255,0.1);
+            padding: 10px;
+            border-radius: 6px;
+        }
+
+        .plan-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.3);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">DeGustte</div>
+            <ul class="sidebar-menu">
+                <li class="menu-group-title">Menu</li>
+                <li><a href="/admin/dashboard.html">📊 Dashboard</a></li>
+                <li><a href="/admin/empresas.html">🏢 Empresas</a></li>
+                <li><a href="#" class="ativo">📂 Cardápio</a></li>
+                <li><a href="#">🍽️ Produtos</a></li>
+                <li><a href="#">⚙️ Configurações</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main -->
+        <div class="main">
+            <!-- Topbar -->
+            <div class="topbar">
+                <div class="topbar-title" id="topbarTitle">Carregando...</div>
+                <div class="topbar-actions">
+                    <button class="btn btn-secondary" onclick="voltarEmpresas()">← Voltar</button>
+                    <button class="logout-btn" onclick="logout()">Sair</button>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="content">
+                <!-- Empresa Header -->
+                <div class="empresa-header" id="empresaHeader"></div>
+
+                <!-- Navigation Tabs -->
+                <div style="margin-bottom: 30px; border-bottom: 2px solid var(--border); display: flex; gap: 0;">
+                    <button class="tab-btn ativo" onclick="mudarAba('cardapio')">📂 Cardápio</button>
+                    <button class="tab-btn" onclick="mudarAba('plano')">📋 Plano</button>
+                    <button class="tab-btn" onclick="mudarAba('config')">⚙️ Configurações</button>
+                </div>
+
+                <!-- Abas de Conteúdo -->
+                <div id="cardapioAba" class="aba ativo">
+                    <div class="card">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <div class="card-title">Categorias do Cardápio</div>
+                            <button class="btn btn-primary" onclick="abrirModalCategoria()">+ Adicionar Categoria</button>
+                        </div>
+
+                        <div id="categoriasList"></div>
+                    </div>
+
+                    <div class="card">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <div class="card-title">Produtos</div>
+                            <button class="btn btn-primary" onclick="abrirModalProduto()">+ Adicionar Produto</button>
+                        </div>
+
+                        <div id="produtosList"></div>
+                    </div>
+                </div>
+
+                <div id="planoAba" class="aba">
+                    <div class="card">
+                        <div class="card-title">Seu Plano</div>
+                        <div id="planoInfo"></div>
+                    </div>
+                </div>
+
+                <div id="configAba" class="aba">
+                    <div class="card">
+                        <div class="card-title">Configurações da Empresa</div>
+                        <div id="configForm"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Categoria -->
+    <div id="categoriaModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span id="categoriaTitulo">Nova Categoria</span>
+                <button class="close-modal" onclick="fecharModal('categoriaModal')">×</button>
+            </div>
+            <div class="form-group">
+                <label for="categoriaNome">Nome da Categoria</label>
+                <input type="text" id="categoriaNome" placeholder="Ex: Entradas">
+            </div>
+            <div class="form-group">
+                <label for="categoriaDesc">Descrição</label>
+                <textarea id="categoriaDesc" placeholder="Descrição da categoria"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="fecharModal('categoriaModal')">Cancelar</button>
+                <button class="btn btn-primary" onclick="salvarCategoria()">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Produto -->
+    <div id="produtoModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span id="produtoTitulo">Novo Produto</span>
+                <button class="close-modal" onclick="fecharModal('produtoModal')">×</button>
+            </div>
+            <div class="form-group">
+                <label for="produtoNome">Nome do Produto</label>
+                <input type="text" id="produtoNome" placeholder="Ex: Moqueca de Peixe">
+            </div>
+            <div class="form-group">
+                <label for="produtoCategoria">Categoria</label>
+                <select id="produtoCategoria"></select>
+            </div>
+            <div class="form-group">
+                <label for="produtoDesc">Descrição</label>
+                <textarea id="produtoDesc" placeholder="Descrição do produto"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="produtoPreco">Preço (R$)</label>
+                <input type="number" id="produtoPreco" placeholder="0.00" step="0.01">
+            </div>
+            <div class="form-group">
+                <label for="produtoDisponivel">
+                    <input type="checkbox" id="produtoDisponivel" checked> Disponível
+                </label>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="fecharModal('produtoModal')">Cancelar</button>
+                <button class="btn btn-primary" onclick="salvarProduto()">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .aba {
+            display: none;
+        }
+
+        .aba.ativo {
+            display: block;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 15px 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.ativo {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab-btn:hover {
+            color: var(--primary);
+        }
+
+        .categoria-item {
+            background: var(--bg-light);
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .categoria-item h4 {
+            margin: 0 0 5px 0;
+        }
+
+        .produto-item {
+            background: var(--bg-light);
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .produto-item h4 {
+            margin: 0 0 5px 0;
+        }
+
+        .produto-preco {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+    </style>
+
+    <script>
+        let empresaId = null;
+        let empresaAtual = null;
+        let categoriaEditId = null;
+        let produtoEditId = null;
+
+        window.addEventListener('load', () => {
+            checkAuth();
+            carregarEmpresa();
+        });
+
+        function checkAuth() {
+            const admin = localStorage.getItem('adminLogado');
+            if (!admin) {
+                window.location.href = '/admin/login.html';
+            }
+        }
+
+        function carregarEmpresa() {
+            const url = new URLSearchParams(window.location.search);
+            empresaId = url.get('id') || localStorage.getItem('empresaAtualId');
+
+            if (!empresaId) {
+                window.location.href = '/admin/empresas.html';
+                return;
+            }
+
+            const empresas = JSON.parse(localStorage.getItem('empresas') || '[]');
+            empresaAtual = empresas.find(e => e.id === empresaId);
+
+            if (!empresaAtual) {
+                alert('Empresa não encontrada');
+                window.location.href = '/admin/empresas.html';
+                return;
+            }
+
+            document.getElementById('topbarTitle').textContent = empresaAtual.nomeEmpresa;
+
+            // Header
+            document.getElementById('empresaHeader').innerHTML = `
+                <h1>${empresaAtual.nomeEmpresa}</h1>
+                <div class="empresa-info">
+                    <div class="empresa-info-item">📧 ${empresaAtual.email}</div>
+                    <div class="empresa-info-item">📱 ${empresaAtual.telefone}</div>
+                    <div class="empresa-info-item">🏷️ ${empresaAtual.cnpj}</div>
+                    <div class="empresa-info-item">
+                        URL: <strong>degustte.com.br/${empresaAtual.slug}</strong>
+                    </div>
+                    <div class="empresa-info-item">
+                        <span class="plan-badge">Plano: ${empresaAtual.plano}</span>
+                    </div>
+                </div>
+            `;
+
+            // Plano Info
+            const features = empresaAtual.plano === 'essencial'
+                ? ['Cardápio Digital', 'Até 50 Produtos', 'Básico']
+                : ['Cardápio Digital', 'Produtos Ilimitados', 'Sistema de Reservas', 'Mapa das Mesas'];
+
+            document.getElementById('planoInfo').innerHTML = `
+                <h3 style="margin-bottom: 15px;">Plano: ${empresaAtual.plano.toUpperCase()}</h3>
+                <ul style="list-style: none; padding: 0;">
+                    ${features.map(f => `<li style="padding: 8px 0; color: var(--text-secondary);">✓ ${f}</li>`).join('')}
+                </ul>
+                <div style="margin-top: 20px; padding: 15px; background: var(--bg-light); border-radius: 6px;">
+                    <p style="font-size: 12px; color: var(--text-secondary);">
+                        Sua empresa foi autorizada em ${new Date(empresaAtual.dataAutorizacao).toLocaleDateString('pt-BR')}
+                    </p>
+                </div>
+            `;
+
+            // Config Form
+            document.getElementById('configForm').innerHTML = `
+                <div class="form-group">
+                    <label>Nome da Empresa</label>
+                    <input type="text" id="configNome" value="${empresaAtual.nomeEmpresa}">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="configEmail" value="${empresaAtual.email}">
+                </div>
+                <div class="form-group">
+                    <label>Telefone</label>
+                    <input type="tel" id="configTelefone" value="${empresaAtual.telefone}">
+                </div>
+                <div class="form-group">
+                    <label>Cor Primária (opcional)</label>
+                    <input type="color" id="configCor" value="#FF6B35">
+                </div>
+                <button class="btn btn-primary" onclick="salvarConfig()">Salvar Configurações</button>
+            `;
+
+            carregarCardapio();
+        }
+
+        function carregarCardapio() {
+            const html = document.getElementById('categoriasList');
+            const categorias = empresaAtual.cardapio.categorias || [];
+
+            if (categorias.length === 0) {
+                html.innerHTML = '<p style="color: var(--text-secondary); text-align: center;">Nenhuma categoria criada</p>';
+            } else {
+                html.innerHTML = categorias.map(cat => `
+                    <div class="categoria-item">
+                        <div>
+                            <h4>${cat.nome}</h4>
+                            <p style="font-size: 13px; color: var(--text-secondary);">${cat.descricao}</p>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn btn-sm btn-secondary" onclick="editarCategoria('${cat.id}')">Editar</button>
+                            <button class="btn btn-sm btn-danger" onclick="deletarCategoria('${cat.id}')">Deletar</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // Produtos
+            const produtos = empresaAtual.cardapio.produtos || [];
+            const prodHtml = document.getElementById('produtosList');
+
+            if (produtos.length === 0) {
+                prodHtml.innerHTML = '<p style="color: var(--text-secondary); text-align: center;">Nenhum produto criado</p>';
+            } else {
+                prodHtml.innerHTML = produtos.map(prod => `
+                    <div class="produto-item">
+                        <div>
+                            <h4>${prod.nome}</h4>
+                            <p style="font-size: 13px; color: var(--text-secondary);">${prod.descricao}</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <div class="produto-preco">R$ ${prod.preco.toFixed(2)}</div>
+                            <div style="font-size: 12px; color: var(--text-secondary); margin-top: 5px;">
+                                ${prod.disponivel ? '✓ Disponível' : '⊘ Indisponível'}
+                            </div>
+                            <div style="margin-top: 10px; display: flex; gap: 5px;">
+                                <button class="btn btn-sm btn-secondary" onclick="editarProduto('${prod.id}')">Editar</button>
+                                <button class="btn btn-sm btn-danger" onclick="deletarProduto('${prod.id}')">Deletar</button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            atualizarSelectCategorias();
+        }
+
+        function atualizarSelectCategorias() {
+            const select = document.getElementById('produtoCategoria');
+            const categorias = empresaAtual.cardapio.categorias || [];
+            select.innerHTML = categorias.map(cat =>
+                `<option value="${cat.id}">${cat.nome}</option>`
+            ).join('');
+        }
+
+        function abrirModalCategoria() {
+            categoriaEditId = null;
+            document.getElementById('categoriaTitulo').textContent = 'Nova Categoria';
+            document.getElementById('categoriaNome').value = '';
+            document.getElementById('categoriaDesc').value = '';
+            document.getElementById('categoriaModal').classList.add('ativo');
+        }
+
+        function editarCategoria(id) {
+            const cat = empresaAtual.cardapio.categorias.find(c => c.id === id);
+            if (!cat) return;
+
+            categoriaEditId = id;
+            document.getElementById('categoriaTitulo').textContent = 'Editar Categoria';
+            document.getElementById('categoriaNome').value = cat.nome;
+            document.getElementById('categoriaDesc').value = cat.descricao;
+            document.getElementById('categoriaModal').classList.add('ativo');
+        }
+
+        function salvarCategoria() {
+            const nome = document.getElementById('categoriaNome').value.trim();
+            const desc = document.getElementById('categoriaDesc').value.trim();
+
+            if (!nome) {
+                alert('Nome da categoria é obrigatório');
+                return;
+            }
+
+            if (categoriaEditId) {
+                const cat = empresaAtual.cardapio.categorias.find(c => c.id === categoriaEditId);
+                if (cat) {
+                    cat.nome = nome;
+                    cat.descricao = desc;
+                }
+            } else {
+                empresaAtual.cardapio.categorias.push({
+                    id: Date.now().toString(),
+                    nome: nome,
+                    descricao: desc
+                });
+            }
+
+            salvarEmpresa();
+            fecharModal('categoriaModal');
+            carregarCardapio();
+        }
+
+        function deletarCategoria(id) {
+            if (!confirm('Deletar esta categoria?')) return;
+            empresaAtual.cardapio.categorias = empresaAtual.cardapio.categorias.filter(c => c.id !== id);
+            salvarEmpresa();
+            carregarCardapio();
+        }
+
+        function abrirModalProduto() {
+            produtoEditId = null;
+            document.getElementById('produtoTitulo').textContent = 'Novo Produto';
+            document.getElementById('produtoNome').value = '';
+            document.getElementById('produtoDesc').value = '';
+            document.getElementById('produtoPreco').value = '';
+            document.getElementById('produtoDisponivel').checked = true;
+            document.getElementById('produtoModal').classList.add('ativo');
+        }
+
+        function editarProduto(id) {
+            const prod = empresaAtual.cardapio.produtos.find(p => p.id === id);
+            if (!prod) return;
+
+            produtoEditId = id;
+            document.getElementById('produtoTitulo').textContent = 'Editar Produto';
+            document.getElementById('produtoNome').value = prod.nome;
+            document.getElementById('produtoDesc').value = prod.descricao;
+            document.getElementById('produtoPreco').value = prod.preco;
+            document.getElementById('produtoDisponivel').checked = prod.disponivel;
+            document.getElementById('produtoCategoria').value = prod.categoriaId;
+            document.getElementById('produtoModal').classList.add('ativo');
+        }
+
+        function salvarProduto() {
+            const nome = document.getElementById('produtoNome').value.trim();
+            const desc = document.getElementById('produtoDesc').value.trim();
+            const preco = parseFloat(document.getElementById('produtoPreco').value) || 0;
+            const catId = document.getElementById('produtoCategoria').value;
+            const disponivel = document.getElementById('produtoDisponivel').checked;
+
+            if (!nome || !catId || preco <= 0) {
+                alert('Preencha todos os campos corretamente');
+                return;
+            }
+
+            if (produtoEditId) {
+                const prod = empresaAtual.cardapio.produtos.find(p => p.id === produtoEditId);
+                if (prod) {
+                    prod.nome = nome;
+                    prod.descricao = desc;
+                    prod.preco = preco;
+                    prod.categoriaId = catId;
+                    prod.disponivel = disponivel;
+                }
+            } else {
+                empresaAtual.cardapio.produtos.push({
+                    id: Date.now().toString(),
+                    nome: nome,
+                    descricao: desc,
+                    preco: preco,
+                    categoriaId: catId,
+                    disponivel: disponivel
+                });
+            }
+
+            salvarEmpresa();
+            fecharModal('produtoModal');
+            carregarCardapio();
+        }
+
+        function deletarProduto(id) {
+            if (!confirm('Deletar este produto?')) return;
+            empresaAtual.cardapio.produtos = empresaAtual.cardapio.produtos.filter(p => p.id !== id);
+            salvarEmpresa();
+            carregarCardapio();
+        }
+
+        function salvarConfig() {
+            empresaAtual.nomeEmpresa = document.getElementById('configNome').value;
+            empresaAtual.email = document.getElementById('configEmail').value;
+            empresaAtual.telefone = document.getElementById('configTelefone').value;
+
+            salvarEmpresa();
+            alert('Configurações salvas!');
+            location.reload();
+        }
+
+        function salvarEmpresa() {
+            const empresas = JSON.parse(localStorage.getItem('empresas') || '[]');
+            const index = empresas.findIndex(e => e.id === empresaId);
+            if (index !== -1) {
+                empresas[index] = empresaAtual;
+                localStorage.setItem('empresas', JSON.stringify(empresas));
+            }
+        }
+
+        function mudarAba(aba) {
+            document.querySelectorAll('.aba').forEach(el => el.classList.remove('ativo'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('ativo'));
+
+            document.getElementById(aba + 'Aba').classList.add('ativo');
+            event.target.classList.add('ativo');
+        }
+
+        function fecharModal(id) {
+            document.getElementById(id).classList.remove('ativo');
+        }
+
+        function voltarEmpresas() {
+            window.location.href = '/admin/empresas.html';
+        }
+
+        function logout() {
+            localStorage.removeItem('adminLogado');
+            window.location.href = '/admin/login.html';
+        }
+    </script>
+</body>
+</html>

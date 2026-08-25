@@ -332,6 +332,7 @@
         </div>
     </div>
 
+    <script src="/admin/js/sync-empresas.js"></script>
     <script>
         const form = document.getElementById('planosForm');
         const submitBtn = document.getElementById('submitBtn');
@@ -385,6 +386,9 @@
                 // Salvar dados
                 localStorage.setItem('planoSelecionado', planoSelecionado);
                 localStorage.setItem('linkPagamento', linkPagamento);
+
+                // Sincronizar com painel admin (salva empresa)
+                salvarEmpresaFromCadastro(passo1Data, planoSelecionado);
 
                 // Redirecionar para WhatsApp
                 setTimeout(() => {
