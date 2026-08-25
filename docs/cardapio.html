@@ -820,8 +820,19 @@
 
             document.getElementById('modalQuantidade').textContent = '1';
 
-            // Adicionais (placeholder por enquanto)
-            document.getElementById('adicionaisContainer').innerHTML = '';
+            // Adicionais
+            const adicionaisHtml = produtoSelecionado.adicionais && produtoSelecionado.adicionais.length > 0
+                ? `<div style="background:#f9f9f9; padding:15px; border-radius:8px;">
+                    <label style="font-weight:bold; display:block; margin-bottom:10px;">Adicionais:</label>
+                    ${produtoSelecionado.adicionais.map((ad, idx) => `
+                        <div style="display:flex; align-items:center; margin-bottom:8px;">
+                            <input type="checkbox" id="ad${idx}" data-preco="${ad.preco}" style="width:18px; height:18px;">
+                            <label for="ad${idx}" style="margin-left:10px; cursor:pointer;">${ad.nome} <span style="color:#27ae60;">+R$ ${parseFloat(ad.preco).toFixed(2)}</span></label>
+                        </div>
+                    `).join('')}
+                  </div>`
+                : '';
+            document.getElementById('adicionaisContainer').innerHTML = adicionaisHtml;
 
             document.getElementById('modalProduto').style.display = 'block';
         }
@@ -846,13 +857,22 @@
         function adicionarNaSacola() {
             if (!produtoSelecionado) return;
 
+            // Coletar adicionais selecionados
+            const adicionaisSelecionados = [];
+            const checkboxes = document.querySelectorAll('#adicionaisContainer input[type="checkbox"]:checked');
+            checkboxes.forEach(cb => {
+                const adNome = cb.nextElementSibling.textContent.split(' ')[0];
+                const adPreco = parseFloat(cb.dataset.preco);
+                adicionaisSelecionados.push({ nome: adNome, preco: adPreco });
+            });
+
             const item = {
                 id: produtoSelecionado.id,
                 nome: produtoSelecionado.nome,
                 preco: parseFloat(produtoSelecionado.preco),
                 desconto: produtoSelecionado.desconto || 0,
                 quantidade: quantidadeModal,
-                adicionais: []
+                adicionais: adicionaisSelecionados
             };
 
             sacola.push(item);
