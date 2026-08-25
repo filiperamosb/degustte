@@ -3,6 +3,8 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import pg from 'pg';
 import path from 'path';
+import https from 'https';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -165,3 +167,18 @@ app.listen(PORT, () => {
   console.log(`📊 API: http://localhost:${PORT}/api`);
   console.log(`🛡️  Admin: http://localhost:${PORT}/admin/login.html`);
 });
+
+// HTTPS (certificado api.degustte.com.br gerado via win-acme)
+const CERT_KEY = 'C:\\degustte\\api.degustte.com.br-key.pem';
+const CERT_CHAIN = 'C:\\degustte\\api.degustte.com.br-chain.pem';
+
+if (fs.existsSync(CERT_KEY) && fs.existsSync(CERT_CHAIN)) {
+  const httpsOptions = {
+    key: fs.readFileSync(CERT_KEY),
+    cert: fs.readFileSync(CERT_CHAIN),
+  };
+
+  https.createServer(httpsOptions, app).listen(443, () => {
+    console.log('🔒 HTTPS rodando em https://api.degustte.com.br');
+  });
+}
