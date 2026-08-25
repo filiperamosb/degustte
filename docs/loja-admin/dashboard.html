@@ -75,6 +75,7 @@
             font-family: inherit;
         }
         textarea { resize: vertical; min-height: 70px; }
+        input:focus, textarea:focus { outline: none; border-color: #667eea; }
 
         .btn {
             background: #667eea;
@@ -87,46 +88,21 @@
         }
         .btn:hover { background: #764ba2; }
         .btn-danger { background: #ff6b6b; padding: 6px 12px; font-size: 0.85em; }
-        .btn-danger:hover { background: #ee5a52; }
-        .btn-outline { background: white; border: 1px solid #667eea; color: #667eea; padding: 6px 12px; font-size: 0.85em; }
 
-        .categoria-item {
-            background: #f9f9f9;
-            padding: 15px;
-            border-left: 4px solid #667eea;
-            margin-bottom: 15px;
-            border-radius: 5px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+        .two-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .three-columns { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
 
-        .produto-item {
-            background: #f0f0f0;
-            padding: 12px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-            border-left: 3px solid #667eea;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
+        .horario-item {
+            display: grid;
+            grid-template-columns: 80px 1fr 1fr 50px;
             gap: 10px;
-        }
-        .produto-item.indisponivel { opacity: 0.5; }
-        .produto-item h4 { color: #333; margin-bottom: 5px; }
-        .produto-item p { color: #666; font-size: 0.9em; margin-bottom: 5px; }
-        .produto-actions { display: flex; gap: 6px; flex-shrink: 0; flex-wrap: wrap; }
-
-        .preco-badge {
-            display: inline-block;
-            background: #27ae60;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 3px;
-            font-weight: bold;
+            align-items: center;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 5px;
+            margin-bottom: 10px;
         }
 
-        .loading { text-align: center; padding: 20px; color: #667eea; }
         .toast {
             position: fixed;
             top: 20px;
@@ -140,8 +116,17 @@
             z-index: 200;
         }
         .toast.error { background: #ff6b6b; }
-        .two-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        @media (max-width: 768px) { .two-columns { grid-template-columns: 1fr; } }
+
+        .upload-preview {
+            max-width: 200px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .two-columns, .three-columns { grid-template-columns: 1fr; }
+            .horario-item { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
@@ -155,19 +140,86 @@
 
     <div class="container">
         <div class="tabs">
-            <button class="tab-btn active" onclick="switchTab('categorias')">Categorias</button>
+            <button class="tab-btn active" onclick="switchTab('perfil')">Perfil</button>
+            <button class="tab-btn" onclick="switchTab('categorias')">Categorias</button>
             <button class="tab-btn" onclick="switchTab('produtos')">Produtos</button>
         </div>
 
-        <div id="categorias" class="tab-content active">
+        <!-- TAB: PERFIL -->
+        <div id="perfil" class="tab-content active">
+            <div class="card">
+                <h2>Banner e Avatar</h2>
+                <div class="two-columns">
+                    <div class="form-group">
+                        <label>URL do Banner</label>
+                        <input type="url" id="bannerUrl" placeholder="https://...">
+                        <img id="previewBanner" class="upload-preview" style="display:none;" alt="Preview">
+                    </div>
+                    <div class="form-group">
+                        <label>URL do Avatar</label>
+                        <input type="url" id="avatarUrl" placeholder="https://...">
+                        <img id="previewAvatar" class="upload-preview" style="display:none; border-radius: 50%; width: 150px; height: 150px; object-fit: cover;" alt="Preview">
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Informações Básicas</h2>
+                <div class="form-group">
+                    <label>Bio/Descrição</label>
+                    <textarea id="bio" placeholder="Conte sobre seu estabelecimento..."></textarea>
+                </div>
+                <div class="two-columns">
+                    <div class="form-group">
+                        <label>Localização/Endereço</label>
+                        <textarea id="localizacao" placeholder="Ex: Rua das Flores, 123 - Centro"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>WhatsApp (apenas números)</label>
+                        <input type="tel" id="whatsapp" placeholder="5511999999999">
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Redes Sociais</h2>
+                <div class="two-columns">
+                    <div class="form-group">
+                        <label>Facebook</label>
+                        <input type="url" id="facebook" placeholder="https://facebook.com/...">
+                    </div>
+                    <div class="form-group">
+                        <label>Instagram</label>
+                        <input type="url" id="instagram" placeholder="https://instagram.com/...">
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Horário de Funcionamento</h2>
+                <div id="horariosContainer"></div>
+            </div>
+
+            <div class="card">
+                <h2>Formas de Pagamento</h2>
+                <div id="pagamentosContainer" class="form-group"></div>
+                <input type="text" id="novoPagamento" placeholder="Ex: Cartão, Dinheiro, PIX">
+                <button class="btn" onclick="adicionarPagamento()">+ Adicionar</button>
+            </div>
+
+            <button class="btn" onclick="salvarPerfil()" style="width: 100%; margin-top: 20px;">💾 Salvar Perfil</button>
+        </div>
+
+        <!-- TAB: CATEGORIAS -->
+        <div id="categorias" class="tab-content">
             <div class="card">
                 <h2>Nova Categoria</h2>
                 <div class="form-group">
-                    <label>Nome:</label>
+                    <label>Nome</label>
                     <input type="text" id="categNome" placeholder="Ex: Entradas">
                 </div>
                 <div class="form-group">
-                    <label>Descrição:</label>
+                    <label>Descrição</label>
                     <textarea id="categDesc" placeholder="Ex: Pratos para começar"></textarea>
                 </div>
                 <button class="btn" onclick="adicionarCategoria()">+ Adicionar Categoria</button>
@@ -175,30 +227,31 @@
 
             <div class="card">
                 <h2>Categorias Cadastradas</h2>
-                <div id="categoriasList" class="loading">Carregando...</div>
+                <div id="categoriasList"></div>
             </div>
         </div>
 
+        <!-- TAB: PRODUTOS -->
         <div id="produtos" class="tab-content">
             <div class="card">
                 <h2>Novo Produto</h2>
                 <div class="form-group">
-                    <label>Nome:</label>
+                    <label>Nome</label>
                     <input type="text" id="prodNome" placeholder="Ex: Água">
                 </div>
                 <div class="form-group">
-                    <label>Descrição:</label>
+                    <label>Descrição</label>
                     <textarea id="prodDesc" placeholder="Ex: 500ml"></textarea>
                 </div>
-                <div class="two-columns">
+                <div class="three-columns">
                     <div class="form-group">
-                        <label>Categoria:</label>
+                        <label>Categoria</label>
                         <select id="prodCategoria">
                             <option value="">Selecione uma categoria</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Preço:</label>
+                        <label>Preço</label>
                         <input type="number" id="prodPreco" placeholder="Ex: 5.50" step="0.01">
                     </div>
                 </div>
@@ -207,7 +260,7 @@
 
             <div class="card">
                 <h2>Produtos Cadastrados</h2>
-                <div id="produtosList" class="loading">Carregando...</div>
+                <div id="produtosList"></div>
             </div>
         </div>
     </div>
@@ -218,6 +271,7 @@
         const API_URL = 'https://api.degustte.com.br/api';
         let slug = null;
         let cardapioCache = { categorias: [], produtos: [] };
+        let pagamentosLocais = [];
 
         window.addEventListener('load', () => {
             const lojaAdmin = localStorage.getItem('lojaAdmin');
@@ -229,8 +283,46 @@
             slug = dados.slug;
             document.getElementById('nomeLoja').textContent = '🍽️ ' + dados.nome_empresa;
             document.getElementById('verLoja').href = `/${slug}`;
-            carregarCardapio();
+            carregarDados();
+            renderizarHorarios();
         });
+
+        async function carregarDados() {
+            try {
+                const response = await fetch(`${API_URL}/empresas/${slug}`);
+                const loja = await response.json();
+                cardapioCache = loja.cardapio || { categorias: [], produtos: [] };
+
+                // Carregar perfil
+                document.getElementById('bannerUrl').value = loja.banner || '';
+                document.getElementById('avatarUrl').value = loja.avatar || '';
+                document.getElementById('bio').value = loja.bio || '';
+                document.getElementById('localizacao').value = loja.localizacao || '';
+                document.getElementById('whatsapp').value = loja.whatsapp || '';
+                document.getElementById('facebook').value = loja.facebook || '';
+                document.getElementById('instagram').value = loja.instagram || '';
+
+                if (loja.banner) document.getElementById('previewBanner').src = loja.banner;
+                if (loja.avatar) document.getElementById('previewAvatar').src = loja.avatar;
+
+                pagamentosLocais = loja.pagamentos || [];
+                renderizarPagamentos();
+
+                if (loja.horarios) {
+                    document.querySelectorAll('[data-dia]').forEach((el, idx) => {
+                        const h = loja.horarios[idx] || { aberto: false };
+                        el.querySelector('[data-abertura]').value = h.abertura || '09:00';
+                        el.querySelector('[data-fechamento]').value = h.fechamento || '22:00';
+                        el.querySelector('[data-aberto]').checked = h.aberto !== false;
+                    });
+                }
+
+                renderizarCategorias();
+                renderizarProdutos();
+            } catch (error) {
+                showToast('Erro ao carregar dados', true);
+            }
+        }
 
         function switchTab(tab) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -239,15 +331,82 @@
             event.target.classList.add('active');
         }
 
-        async function carregarCardapio() {
+        function renderizarHorarios() {
+            const dias = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
+            let html = '';
+            dias.forEach((dia, idx) => {
+                html += `
+                    <div class="horario-item" data-dia="${idx}">
+                        <strong>${dia}</strong>
+                        <input type="time" data-abertura value="09:00">
+                        <input type="time" data-fechamento value="22:00">
+                        <input type="checkbox" data-aberto checked>
+                    </div>
+                `;
+            });
+            document.getElementById('horariosContainer').innerHTML = html;
+        }
+
+        function renderizarPagamentos() {
+            const html = pagamentosLocais.map(p => `
+                <span class="pagamento-badge" style="display:inline-block; background:#f0f0f0; padding:6px 12px; border-radius:20px; margin-right:8px; margin-bottom:8px;">
+                    ${p} <button onclick="removerPagamento('${p}')" style="background:none; border:none; cursor:pointer; margin-left:6px;">✕</button>
+                </span>
+            `).join('');
+            document.getElementById('pagamentosContainer').innerHTML = html;
+        }
+
+        function adicionarPagamento() {
+            const novo = document.getElementById('novoPagamento').value.trim();
+            if (!novo) return;
+            if (!pagamentosLocais.includes(novo)) {
+                pagamentosLocais.push(novo);
+            }
+            document.getElementById('novoPagamento').value = '';
+            renderizarPagamentos();
+        }
+
+        function removerPagamento(pagamento) {
+            pagamentosLocais = pagamentosLocais.filter(p => p !== pagamento);
+            renderizarPagamentos();
+        }
+
+        async function salvarPerfil() {
+            const horarios = [];
+            document.querySelectorAll('[data-dia]').forEach(el => {
+                horarios.push({
+                    aberto: el.querySelector('[data-aberto]').checked,
+                    abertura: el.querySelector('[data-abertura]').value,
+                    fechamento: el.querySelector('[data-fechamento]').value
+                });
+            });
+
+            const dados = {
+                banner: document.getElementById('bannerUrl').value,
+                avatar: document.getElementById('avatarUrl').value,
+                bio: document.getElementById('bio').value,
+                localizacao: document.getElementById('localizacao').value,
+                whatsapp: document.getElementById('whatsapp').value,
+                facebook: document.getElementById('facebook').value,
+                instagram: document.getElementById('instagram').value,
+                horarios: horarios,
+                pagamentos: pagamentosLocais
+            };
+
             try {
-                const response = await fetch(`${API_URL}/empresas/${slug}`);
-                const empresa = await response.json();
-                cardapioCache = empresa.cardapio || { categorias: [], produtos: [] };
-                renderizarCategorias();
-                renderizarProdutos();
+                const response = await fetch(`${API_URL}/empresas/${slug}/perfil`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dados)
+                });
+                if (response.ok) {
+                    showToast('Perfil salvo com sucesso!');
+                    carregarDados();
+                } else {
+                    showToast('Erro ao salvar', true);
+                }
             } catch (error) {
-                console.error('Erro:', error);
+                showToast('Erro: ' + error.message, true);
             }
         }
 
@@ -257,7 +416,7 @@
                 lista.innerHTML = '<p>Nenhuma categoria cadastrada</p>';
             } else {
                 lista.innerHTML = cardapioCache.categorias.map(cat => `
-                    <div class="categoria-item">
+                    <div style="background:#f9f9f9; padding:15px; border-radius:5px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
                         <div>
                             <strong>${cat.nome}</strong>
                             <p>${cat.descricao || 'Sem descrição'}</p>
@@ -284,15 +443,12 @@
             lista.innerHTML = cardapioCache.produtos.map(prod => {
                 const categoria = cardapioCache.categorias.find(c => c.id === prod.categoriaId);
                 return `
-                    <div class="produto-item ${prod.disponivel === false ? 'indisponivel' : ''}">
-                        <div>
-                            <h4>${prod.nome}</h4>
-                            <p>${prod.descricao || 'Sem descrição'}</p>
-                            <p><strong>Categoria:</strong> ${categoria?.nome || 'N/A'}</p>
-                            <span class="preco-badge">R$ ${parseFloat(prod.preco).toFixed(2)}</span>
-                        </div>
-                        <div class="produto-actions">
-                            <button class="btn btn-outline" onclick="alternarDisponibilidade('${prod.id}', ${prod.disponivel === false})">
+                    <div style="background:#f0f0f0; padding:12px; border-radius:5px; margin-bottom:10px; border-left:3px solid #667eea;">
+                        <strong>${prod.nome}</strong>
+                        <p>${prod.descricao || '-'} | R$ ${parseFloat(prod.preco).toFixed(2)}</p>
+                        <p style="color:#999; font-size:0.9em;">Categoria: ${categoria?.nome || 'N/A'}</p>
+                        <div style="margin-top:8px; display:flex; gap:6px;">
+                            <button class="btn btn-outline" onclick="alternarDisponibilidade('${prod.id}', ${prod.disponivel === false})" style="background:white; border:1px solid #667eea; color:#667eea; font-size:0.85em;">
                                 ${prod.disponivel === false ? 'Ativar' : 'Pausar'}
                             </button>
                             <button class="btn btn-danger" onclick="excluirProduto('${prod.id}')">Excluir</button>
@@ -317,7 +473,7 @@
                     showToast('Categoria adicionada!');
                     document.getElementById('categNome').value = '';
                     document.getElementById('categDesc').value = '';
-                    carregarCardapio();
+                    carregarDados();
                 } else {
                     showToast('Erro ao adicionar categoria', true);
                 }
@@ -332,7 +488,7 @@
                 const response = await fetch(`${API_URL}/empresas/${slug}/categorias/${id}`, { method: 'DELETE' });
                 if (response.ok) {
                     showToast('Categoria excluída!');
-                    carregarCardapio();
+                    carregarDados();
                 } else {
                     showToast('Erro ao excluir', true);
                 }
@@ -361,7 +517,7 @@
                     document.getElementById('prodDesc').value = '';
                     document.getElementById('prodCategoria').value = '';
                     document.getElementById('prodPreco').value = '';
-                    carregarCardapio();
+                    carregarDados();
                 } else {
                     showToast('Erro ao adicionar produto', true);
                 }
@@ -379,7 +535,7 @@
                 });
                 if (response.ok) {
                     showToast(novoValor ? 'Produto ativado!' : 'Produto pausado!');
-                    carregarCardapio();
+                    carregarDados();
                 } else {
                     showToast('Erro ao atualizar', true);
                 }
@@ -394,7 +550,7 @@
                 const response = await fetch(`${API_URL}/empresas/${slug}/produtos/${id}`, { method: 'DELETE' });
                 if (response.ok) {
                     showToast('Produto excluído!');
-                    carregarCardapio();
+                    carregarDados();
                 } else {
                     showToast('Erro ao excluir', true);
                 }
@@ -415,6 +571,21 @@
             localStorage.removeItem('lojaAdmin');
             window.location.href = '/loja-admin/login.html';
         }
+
+        // Preview de imagens
+        document.getElementById('bannerUrl').addEventListener('change', (e) => {
+            if (e.target.value) {
+                document.getElementById('previewBanner').src = e.target.value;
+                document.getElementById('previewBanner').style.display = 'block';
+            }
+        });
+
+        document.getElementById('avatarUrl').addEventListener('change', (e) => {
+            if (e.target.value) {
+                document.getElementById('previewAvatar').src = e.target.value;
+                document.getElementById('previewAvatar').style.display = 'block';
+            }
+        });
     </script>
 </body>
 </html>

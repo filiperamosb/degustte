@@ -5,223 +5,510 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cardápio - DeGustte</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; color: #333; }
+
+        .back-link { display: inline-block; padding: 12px 20px; color: #667eea; text-decoration: none; margin: 15px; font-weight: 600; }
+        .back-link:hover { text-decoration: underline; }
+
+        /* Banner e Avatar */
+        .banner-section {
+            position: relative;
+            height: 250px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            overflow: hidden;
         }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f5f5;
-            padding: 20px;
+        .banner-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-
-        header {
+        .profile-header {
             background: white;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 0 20px 30px;
+            position: relative;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
 
-        header h1 {
-            color: #667eea;
-            margin-bottom: 10px;
+        .avatar-section {
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+            margin-top: -60px;
+            position: relative;
+            z-index: 10;
         }
 
-        header p {
-            color: #666;
-            font-size: 0.95em;
+        .avatar {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            border: 5px solid white;
+            object-fit: cover;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+            background: #f0f0f0;
         }
 
-        .atualizar {
-            display: inline-block;
-            background: #667eea;
-            color: white;
-            padding: 8px 15px;
-            border-radius: 5px;
-            font-size: 0.85em;
-            margin-top: 10px;
-            cursor: pointer;
-            border: none;
+        .info-principal {
+            flex: 1;
+            padding-top: 15px;
         }
 
-        .atualizar:hover {
-            background: #764ba2;
-        }
-
-        .categoria {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        .categoria h2 {
-            color: #667eea;
-            margin-bottom: 15px;
-            border-bottom: 2px solid #667eea;
-            padding-bottom: 10px;
-        }
-
-        .produto {
-            padding: 15px;
-            border-left: 4px solid #667eea;
-            margin-bottom: 15px;
-            background: #f9f9f9;
-            border-radius: 5px;
-        }
-
-        .produto h3 {
-            color: #333;
+        .nome-estabelecimento {
+            font-size: 2em;
+            font-weight: 700;
+            color: #1a1a1a;
             margin-bottom: 5px;
         }
 
-        .produto p {
+        .tipo-estabelecimento {
+            color: #667eea;
+            font-size: 1.05em;
+            margin-bottom: 15px;
+        }
+
+        .bio {
             color: #666;
-            font-size: 0.95em;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        /* Redes Sociais */
+        .social-links {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .social-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            text-decoration: none;
+            font-size: 20px;
+            transition: all 0.3s;
+            border: 2px solid #e0e0e0;
+        }
+
+        .social-btn:hover { transform: translateY(-3px); }
+        .social-btn.facebook { color: #1877F2; border-color: #1877F2; }
+        .social-btn.instagram { color: #E4405F; border-color: #E4405F; }
+        .social-btn.whatsapp { color: #25D366; border-color: #25D366; }
+
+        /* Info Cards */
+        .info-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .info-card {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .info-card-title {
+            font-weight: 600;
+            color: #667eea;
+            font-size: 0.9em;
             margin-bottom: 8px;
         }
 
-        .preco {
+        .info-card-content {
+            color: #333;
+            font-size: 0.95em;
+        }
+
+        .horario-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 0.9em;
+        }
+
+        .horario-item:last-child { border-bottom: none; }
+        .dia { font-weight: 600; }
+        .hora { color: #667eea; }
+        .fechado { color: #999; }
+
+        /* Formas de Pagamento */
+        .pagamentos {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .pagamento-badge {
+            background: #f0f0f0;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            color: #333;
+            border: 1px solid #e0e0e0;
+        }
+
+        /* Container Principal */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .content-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 30px;
+            margin-top: 30px;
+            margin-bottom: 40px;
+        }
+
+        .cardapio-section {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .categoria {
+            margin-bottom: 40px;
+        }
+
+        .categoria-titulo {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .categoria-descricao {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 0.95em;
+        }
+
+        .produtos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .produto {
+            background: #f9f9f9;
+            border-radius: 8px;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s;
+        }
+
+        .produto:hover {
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.2);
+            transform: translateY(-3px);
+        }
+
+        .produto.indisponivel {
+            opacity: 0.6;
+            background: #f0f0f0;
+        }
+
+        .produto-nome {
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 6px;
+        }
+
+        .produto-desc {
+            color: #666;
+            font-size: 0.85em;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .produto-preco {
             color: #27ae60;
-            font-weight: bold;
+            font-weight: 700;
+            font-size: 1.15em;
+        }
+
+        .indisponivel-label {
+            display: inline-block;
+            background: #999;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.75em;
+            margin-top: 8px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .sidebar-title {
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 15px;
             font-size: 1.1em;
+        }
+
+        .localizacao-box {
+            background: #f9f9f9;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .atualizar-btn {
+            width: 100%;
+            padding: 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: background 0.3s;
+        }
+
+        .atualizar-btn:hover {
+            background: #764ba2;
         }
 
         .loading {
             text-align: center;
             padding: 40px;
-            font-size: 1.2em;
             color: #667eea;
         }
 
-        .error {
-            background: #ff6b6b;
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 20px;
-        }
+        @media (max-width: 768px) {
+            .avatar-section {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                margin-top: -40px;
+            }
 
-        .back-link {
-            display: inline-block;
-            margin-bottom: 20px;
-            color: #667eea;
-            text-decoration: none;
-            font-weight: bold;
-        }
+            .content-wrapper {
+                grid-template-columns: 1fr;
+            }
 
-        .back-link:hover {
-            text-decoration: underline;
+            .sidebar {
+                position: static;
+            }
+
+            .nome-estabelecimento {
+                font-size: 1.5em;
+            }
         }
     </style>
 </head>
 <body>
+    <a href="/" class="back-link">← Voltar às lojas</a>
+
+    <div class="banner-section">
+        <img id="bannerImg" class="banner-img" alt="Banner" style="display:none;">
+    </div>
+
+    <div class="profile-header">
+        <div class="container">
+            <div class="avatar-section">
+                <img id="avatarImg" class="avatar" alt="Avatar" style="display:none;">
+                <div class="info-principal">
+                    <div class="nome-estabelecimento" id="nomeEstabelecimento">Carregando...</div>
+                    <div class="tipo-estabelecimento" id="tipoEstabelecimento">Carregando...</div>
+                    <div class="bio" id="bioEstabelecimento"></div>
+
+                    <div class="social-links">
+                        <a href="#" class="social-btn facebook" id="btnFacebook" style="display:none;" target="_blank">f</a>
+                        <a href="#" class="social-btn instagram" id="btnInstagram" style="display:none;" target="_blank">📷</a>
+                        <a href="#" class="social-btn whatsapp" id="btnWhatsapp" style="display:none;" target="_blank">💬</a>
+                    </div>
+
+                    <div class="info-cards">
+                        <div class="info-card">
+                            <div class="info-card-title">📞 CONTATO</div>
+                            <div class="info-card-content" id="teleoneInfo">-</div>
+                        </div>
+
+                        <div class="info-card">
+                            <div class="info-card-title">📧 EMAIL</div>
+                            <div class="info-card-content" id="emailInfo" style="word-break: break-all;"></div>
+                        </div>
+
+                        <div class="info-card">
+                            <div class="info-card-title">🕐 HORÁRIO</div>
+                            <div id="horarioInfo" class="info-card-content"></div>
+                        </div>
+
+                        <div class="info-card">
+                            <div class="info-card-title">💳 PAGAMENTO</div>
+                            <div id="pagamentoInfo" class="info-card-content"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="container">
-        <a href="/" class="back-link">← Voltar às lojas</a>
+        <div class="content-wrapper">
+            <div class="cardapio-section" id="cardapioContainer">
+                <div class="loading">Carregando cardápio...</div>
+            </div>
 
-        <header id="info" class="loading">
-            Carregando cardápio...
-        </header>
+            <div class="sidebar">
+                <div class="sidebar-title">📍 LOCALIZAÇÃO</div>
+                <div class="localizacao-box" id="localizacaoInfo">
+                    Informação não disponível
+                </div>
 
-        <button class="atualizar" onclick="carregarCardapio()">🔄 Atualizar</button>
-
-        <div id="cardapio"></div>
-
-        <footer style="text-align:center; margin-top:40px; padding:20px;">
-            <a id="linkDono" href="/loja-admin/login.html" class="back-link">🔧 É o dono deste restaurante? Acesse o painel</a>
-        </footer>
+                <a href="#" id="linkDono" class="atualizar-btn" target="_blank">🔧 Painel do Dono</a>
+            </div>
+        </div>
     </div>
 
     <script>
         const API_URL = 'https://api.degustte.com.br/api';
+        let slug = null;
 
-        function getSlugFromURL() {
-            const params = new URLSearchParams(window.location.search);
-            if (params.get('slug')) return params.get('slug');
-            const path = window.location.pathname.replace(/^\/+|\/+$/g, '');
-            return path || null;
+        window.addEventListener('load', async () => {
+            // Extrai slug da URL
+            slug = window.location.pathname.split('/').pop() || 'restaurantealameda22';
+            await carregarLoja();
+        });
+
+        async function carregarLoja() {
+            try {
+                const response = await fetch(`${API_URL}/empresas/${slug}`);
+                if (!response.ok) throw new Error('Loja não encontrada');
+
+                const loja = await response.json();
+                renderizarPerfil(loja);
+                renderizarCardapio(loja);
+            } catch (erro) {
+                document.getElementById('cardapioContainer').innerHTML = '<div class="loading">Erro ao carregar loja</div>';
+            }
         }
 
-        async function carregarCardapio() {
-            const slug = getSlugFromURL();
-            if (!slug) {
-                document.getElementById('cardapio').innerHTML = '<div class="error">Loja não encontrada</div>';
+        function renderizarPerfil(loja) {
+            // Avatar
+            if (loja.avatar) {
+                document.getElementById('avatarImg').src = loja.avatar;
+                document.getElementById('avatarImg').style.display = 'block';
+            } else {
+                document.getElementById('avatarImg').style.display = 'none';
+            }
+
+            // Banner
+            if (loja.banner) {
+                document.getElementById('bannerImg').src = loja.banner;
+                document.getElementById('bannerImg').style.display = 'block';
+            }
+
+            // Info básica
+            document.getElementById('nomeEstabelecimento').textContent = loja.nome_empresa;
+            document.getElementById('tipoEstabelecimento').textContent = (loja.tipo || 'Restaurante').toUpperCase();
+            document.getElementById('bioEstabelecimento').textContent = loja.bio || '';
+            document.getElementById('teleoneInfo').textContent = loja.telefone || '-';
+            document.getElementById('emailInfo').textContent = loja.email || '-';
+
+            // Redes Sociais
+            if (loja.facebook) {
+                document.getElementById('btnFacebook').href = loja.facebook;
+                document.getElementById('btnFacebook').style.display = 'inline-flex';
+            }
+            if (loja.instagram) {
+                document.getElementById('btnInstagram').href = loja.instagram;
+                document.getElementById('btnInstagram').style.display = 'inline-flex';
+            }
+            if (loja.whatsapp) {
+                document.getElementById('btnWhatsapp').href = 'https://wa.me/' + loja.whatsapp.replace(/\D/g, '');
+                document.getElementById('btnWhatsapp').style.display = 'inline-flex';
+            }
+
+            // Horários
+            if (loja.horarios) {
+                const dias = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
+                let html = '';
+                dias.forEach((dia, idx) => {
+                    const h = loja.horarios[idx] || { aberto: false };
+                    html += `<div class="horario-item"><span class="dia">${dia}</span><span class="${h.aberto ? 'hora' : 'fechado'}">${h.aberto ? h.abertura + ' - ' + h.fechamento : 'Fechado'}</span></div>`;
+                });
+                document.getElementById('horarioInfo').innerHTML = html;
+            }
+
+            // Formas de Pagamento
+            if (loja.pagamentos && Array.isArray(loja.pagamentos)) {
+                const badges = loja.pagamentos.map(p => `<span class="pagamento-badge">${p}</span>`).join('');
+                document.getElementById('pagamentoInfo').innerHTML = badges;
+            }
+
+            // Localização
+            if (loja.localizacao) {
+                document.getElementById('localizacaoInfo').innerHTML = loja.localizacao;
+            }
+
+            // Link do dono
+            document.getElementById('linkDono').href = `/loja-admin/login.html?slug=${slug}`;
+        }
+
+        function renderizarCardapio(loja) {
+            const cardapio = loja.cardapio || { categorias: [], produtos: [] };
+
+            if (!cardapio.categorias || cardapio.categorias.length === 0) {
+                document.getElementById('cardapioContainer').innerHTML = '<div class="loading">Cardápio ainda não foi preenchido</div>';
                 return;
             }
 
-            try {
-                const response = await fetch(`${API_URL}/empresas/${slug}`);
-                const empresa = await response.json();
+            let html = '';
+            cardapio.categorias.forEach(cat => {
+                const produtos = cardapio.produtos.filter(p => p.categoriaId === cat.id);
+                if (produtos.length === 0) return;
 
-                // Atualizar header
-                const headerDiv = document.getElementById('info');
-                headerDiv.innerHTML = `
-                    <div>
-                        <h1>${empresa.nome_empresa}</h1>
-                        <p>📧 ${empresa.email} | 📞 ${empresa.telefone}</p>
+                html += `
+                    <div class="categoria">
+                        <div class="categoria-titulo">${cat.nome}</div>
+                        ${cat.descricao ? `<div class="categoria-descricao">${cat.descricao}</div>` : ''}
+                        <div class="produtos-grid">
+                            ${produtos.map(p => `
+                                <div class="produto ${p.disponivel === false ? 'indisponivel' : ''}">
+                                    <div class="produto-nome">${p.nome}</div>
+                                    ${p.descricao ? `<div class="produto-desc">${p.descricao}</div>` : ''}
+                                    <div class="produto-preco">R$ ${parseFloat(p.preco).toFixed(2)}</div>
+                                    ${p.disponivel === false ? '<div class="indisponivel-label">Indisponível</div>' : ''}
+                                </div>
+                            `).join('')}
+                        </div>
                     </div>
                 `;
-                headerDiv.classList.remove('loading');
+            });
 
-                document.getElementById('linkDono').href = `/loja-admin/login.html?slug=${slug}`;
-
-                // Carregar cardápio
-                const cardapio = empresa.cardapio || { categorias: [], produtos: [] };
-                const cardapioDiv = document.getElementById('cardapio');
-
-                if (!cardapio.categorias || cardapio.categorias.length === 0) {
-                    cardapioDiv.innerHTML = '<p class="error">Nenhum cardápio disponível</p>';
-                    return;
-                }
-
-                cardapioDiv.innerHTML = '';
-
-                cardapio.categorias.forEach(categoria => {
-                    const categDiv = document.createElement('div');
-                    categDiv.className = 'categoria';
-                    categDiv.innerHTML = `<h2>${categoria.nome}</h2>`;
-
-                    const produtosDaCategoria = cardapio.produtos.filter(
-                        p => p.categoriaId === categoria.id && p.disponivel !== false
-                    );
-
-                    if (produtosDaCategoria.length === 0) {
-                        categDiv.innerHTML += '<p>Nenhum produto disponível</p>';
-                    } else {
-                        produtosDaCategoria.forEach(produto => {
-                            categDiv.innerHTML += `
-                                <div class="produto">
-                                    <h3>${produto.nome}</h3>
-                                    <p>${produto.descricao || 'Sem descrição'}</p>
-                                    <span class="preco">R$ ${parseFloat(produto.preco).toFixed(2)}</span>
-                                </div>
-                            `;
-                        });
-                    }
-
-                    cardapioDiv.appendChild(categDiv);
-                });
-
-            } catch (error) {
-                console.error('Erro ao carregar cardápio:', error);
-                document.getElementById('cardapio').innerHTML = '<div class="error">Erro ao carregar cardápio</div>';
-            }
+            document.getElementById('cardapioContainer').innerHTML = html;
         }
 
-        // Carregar ao abrir página
-        carregarCardapio();
-
-        // Atualizar a cada 10 segundos (opcional)
-        setInterval(carregarCardapio, 10000);
+        // Auto-refresh a cada 10 segundos
+        setInterval(carregarLoja, 10000);
     </script>
 </body>
 </html>
