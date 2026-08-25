@@ -517,18 +517,22 @@
         }
 
         .feature-list li {
-            padding: 10px 0;
+            padding: 12px 0 12px 30px;
             color: #666;
             display: flex;
             align-items: center;
+            position: relative;
+            font-size: 16px;
+            line-height: 1.6;
         }
 
         .feature-list li:before {
-            content: "✓";
+            content: "•";
             color: #E74C3C;
             font-weight: bold;
-            margin-right: 10px;
-            font-size: 18px;
+            position: absolute;
+            left: 0;
+            font-size: 20px;
         }
 
         /* Blog Section */
