@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagamento Confirmado - DeGustte</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #E74C3C 0%, #C0392B 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 60px 40px;
+            max-width: 600px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: #27ae60;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            font-size: 40px;
+        }
+
+        h1 {
+            font-size: 36px;
+            color: #1a1a1a;
+            margin-bottom: 15px;
+        }
+
+        p {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        .reference {
+            background: #f0f0f0;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 30px 0;
+            font-family: monospace;
+            color: #333;
+            word-break: break-all;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 14px 40px;
+            background: linear-gradient(135deg, #E74C3C 0%, #C0392B 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(231, 76, 60, 0.3);
+        }
+
+        .steps {
+            margin-top: 40px;
+            text-align: left;
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 12px;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background: #E74C3C;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .step-text {
+            color: #333;
+            font-size: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="success-icon">✓</div>
+
+        <h1>Pagamento Confirmado! 🎉</h1>
+        <p>Sua empresa foi registrada com sucesso na plataforma DeGustte!</p>
+
+        <div class="reference" id="referenceId">
+            Processando...
+        </div>
+
+        <p style="color: #999; font-size: 14px;">Guarde esta referência para futuras consultas</p>
+
+        <a href="/" class="btn">Voltar ao Início</a>
+
+        <div class="steps">
+            <h3 style="color: #1a1a1a; margin-bottom: 15px;">Próximos Passos:</h3>
+
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-text">
+                    <strong>Acesso à plataforma</strong><br>
+                    Você receberá um email com seus dados de acesso
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-text">
+                    <strong>Configurar perfil</strong><br>
+                    Complete seu perfil com logo e descrição (Passo 2)
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-text">
+                    <strong>Cardápio Digital</strong><br>
+                    Comece a adicionar seus produtos (Passo 3)
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">4</div>
+                <div class="step-text">
+                    <strong>Ao vivo!</strong><br>
+                    Seu cardápio digital estará pronto para usar
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Pegar ID de referência da URL
+        const params = new URLSearchParams(window.location.search);
+        const reference = params.get('external_reference');
+
+        if (reference) {
+            document.getElementById('referenceId').textContent = reference;
+        }
+    </script>
+</body>
+</html>

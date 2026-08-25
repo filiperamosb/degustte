@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagamento Pendente - DeGustte</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 60px 40px;
+            max-width: 600px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .pending-icon {
+            width: 80px;
+            height: 80px;
+            background: #f39c12;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            font-size: 40px;
+            color: white;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        h1 {
+            font-size: 36px;
+            color: #1a1a1a;
+            margin-bottom: 15px;
+        }
+
+        p {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        .alert {
+            background: #fde8c9;
+            border: 2px solid #f8b88b;
+            color: #7d4d1b;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 30px 0;
+            font-size: 14px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 14px 40px;
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            margin: 10px;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(243, 156, 18, 0.3);
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+        }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+            box-shadow: 0 10px 20px rgba(149, 165, 166, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="pending-icon">⏳</div>
+
+        <h1>Pagamento Pendente ⏱️</h1>
+        <p>Seu pagamento está sendo processado e ainda não foi confirmado.</p>
+
+        <div class="alert">
+            <strong>Informações importantes:</strong><br>
+            • O processamento pode levar até 24 horas<br>
+            • Você receberá um email de confirmação<br>
+            • Não feche esta janela agora
+        </div>
+
+        <p><strong>Fique tranquilo!</strong> Nós enviaremos um email confirmando seu pagamento assim que tudo for processado.</p>
+
+        <div>
+            <a href="/" class="btn">Voltar ao Início</a>
+            <a href="/cadastro-pagamento.html" class="btn btn-secondary">Voltar ao Formulário</a>
+        </div>
+
+        <p style="margin-top: 30px; color: #999; font-size: 14px;">
+            Dúvidas? Entre em contato com nosso suporte:<br>
+            <strong>suporte@degustte.com.br</strong>
+        </p>
+    </div>
+</body>
+</html>
