@@ -26,21 +26,27 @@ const pool = new Pool({
 // Executar migrações ao iniciar
 (async () => {
   try {
-    await pool.query(`
-      ALTER TABLE empresas
-      ADD COLUMN IF NOT EXISTS avatar TEXT,
-      ADD COLUMN IF NOT EXISTS banner TEXT,
-      ADD COLUMN IF NOT EXISTS bio TEXT,
-      ADD COLUMN IF NOT EXISTS horarios JSONB,
-      ADD COLUMN IF NOT EXISTS pagamentos JSONB,
-      ADD COLUMN IF NOT EXISTS localizacao VARCHAR(255),
-      ADD COLUMN IF NOT EXISTS whatsapp VARCHAR(20),
-      ADD COLUMN IF NOT EXISTS facebook VARCHAR(255),
-      ADD COLUMN IF NOT EXISTS instagram VARCHAR(255)
-    `);
-    console.log('✅ Colunas de perfil criadas (ou já existiam)');
+    // Avatar
+    await pool.query(`ALTER TABLE empresas ADD COLUMN IF NOT EXISTS avatar TEXT`).catch(() => {});
+    // Banner
+    await pool.query(`ALTER TABLE empresas ADD COLUMN IF NOT EXISTS banner TEXT`).catch(() => {});
+    // Bio
+    await pool.query(`ALTER TABLE empresas ADD COLUMN IF NOT EXISTS bio TEXT`).catch(() => {});
+    // Horarios
+    await pool.query(`ALTER TABLE empresas ADD COLUMN IF NOT EXISTS horarios JSONB`).catch(() => {});
+    // Pagamentos
+    await pool.query(`ALTER TABLE empresas ADD COLUMN IF NOT EXISTS pagamentos JSONB`).catch(() => {});
+    // Localizacao
+    await pool.query(`ALTER TABLE empresas ADD COLUMN IF NOT EXISTS localizacao VARCHAR(255)`).catch(() => {});
+    // Whatsapp
+    await pool.query(`ALTER TABLE empresas ADD COLUMN IF NOT EXISTS whatsapp VARCHAR(20)`).catch(() => {});
+    // Facebook
+    await pool.query(`ALTER TABLE empresas ADD COLUMN IF NOT EXISTS facebook VARCHAR(255)`).catch(() => {});
+    // Instagram
+    await pool.query(`ALTER TABLE empresas ADD COLUMN IF NOT EXISTS instagram VARCHAR(255)`).catch(() => {});
+    console.log('✅ Migrações executadas');
   } catch (erro) {
-    console.error('Erro ao executar migrações:', erro.message);
+    console.error('⚠️ Erro ao executar migrações:', erro.message);
   }
 })();
 
