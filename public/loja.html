@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cardápio - DeGustte</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            color: #666;
+            font-size: 0.95em;
+        }
+
+        .atualizar {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-size: 0.85em;
+            margin-top: 10px;
+            cursor: pointer;
+            border: none;
+        }
+
+        .atualizar:hover {
+            background: #764ba2;
+        }
+
+        .categoria {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .categoria h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .produto {
+            padding: 15px;
+            border-left: 4px solid #667eea;
+            margin-bottom: 15px;
+            background: #f9f9f9;
+            border-radius: 5px;
+        }
+
+        .produto h3 {
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .produto p {
+            color: #666;
+            font-size: 0.95em;
+            margin-bottom: 8px;
+        }
+
+        .preco {
+            color: #27ae60;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.2em;
+            color: #667eea;
+        }
+
+        .error {
+            background: #ff6b6b;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="back-link">← Voltar às lojas</a>
+
+        <header id="info" class="loading">
+            Carregando cardápio...
+        </header>
+
+        <button class="atualizar" onclick="carregarCardapio()">🔄 Atualizar</button>
+
+        <div id="cardapio"></div>
+    </div>
+
+    <script>
+        const API_URL = 'http://167.114.30.91:3000/api';
+
+        function getSlugFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('slug');
+        }
+
+        async function carregarCardapio() {
+            const slug = getSlugFromURL();
+            if (!slug) {
+                document.getElementById('cardapio').innerHTML = '<div class="error">Loja não encontrada</div>';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/empresas/${slug}`);
+                const empresa = await response.json();
+
+                // Atualizar header
+                const headerDiv = document.getElementById('info');
+                headerDiv.innerHTML = `
+                    <div>
+                        <h1>${empresa.nome_empresa}</h1>
+                        <p>📧 ${empresa.email} | 📞 ${empresa.telefone}</p>
+                    </div>
+                `;
+                headerDiv.classList.remove('loading');
+
+                // Carregar cardápio
+                const cardapio = empresa.cardapio || { categorias: [], produtos: [] };
+                const cardapioDiv = document.getElementById('cardapio');
+
+                if (!cardapio.categorias || cardapio.categorias.length === 0) {
+                    cardapioDiv.innerHTML = '<p class="error">Nenhum cardápio disponível</p>';
+                    return;
+                }
+
+                cardapioDiv.innerHTML = '';
+
+                cardapio.categorias.forEach(categoria => {
+                    const categDiv = document.createElement('div');
+                    categDiv.className = 'categoria';
+                    categDiv.innerHTML = `<h2>${categoria.nome}</h2>`;
+
+                    const produtosDaCategoria = cardapio.produtos.filter(
+                        p => p.categoriaId === categoria.id && p.disponivel !== false
+                    );
+
+                    if (produtosDaCategoria.length === 0) {
+                        categDiv.innerHTML += '<p>Nenhum produto disponível</p>';
+                    } else {
+                        produtosDaCategoria.forEach(produto => {
+                            categDiv.innerHTML += `
+                                <div class="produto">
+                                    <h3>${produto.nome}</h3>
+                                    <p>${produto.descricao || 'Sem descrição'}</p>
+                                    <span class="preco">R$ ${parseFloat(produto.preco).toFixed(2)}</span>
+                                </div>
+                            `;
+                        });
+                    }
+
+                    cardapioDiv.appendChild(categDiv);
+                });
+
+            } catch (error) {
+                console.error('Erro ao carregar cardápio:', error);
+                document.getElementById('cardapio').innerHTML = '<div class="error">Erro ao carregar cardápio</div>';
+            }
+        }
+
+        // Carregar ao abrir página
+        carregarCardapio();
+
+        // Atualizar a cada 10 segundos (opcional)
+        setInterval(carregarCardapio, 10000);
+    </script>
+</body>
+</html>

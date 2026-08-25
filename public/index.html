@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeGustte - Cardápios Digitais</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .lojas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .loja-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .loja-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .loja-card h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.5em;
+        }
+
+        .loja-card p {
+            color: #666;
+            margin-bottom: 15px;
+            font-size: 0.95em;
+        }
+
+        .loja-card a {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background 0.3s;
+        }
+
+        .loja-card a:hover {
+            background: #764ba2;
+        }
+
+        .loading {
+            text-align: center;
+            color: white;
+            font-size: 1.2em;
+        }
+
+        .error {
+            background: #ff6b6b;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🍽️ DeGustte</h1>
+            <p>Cardápios Digitais em Tempo Real</p>
+        </header>
+
+        <div id="lojas" class="lojas-grid">
+            <div class="loading">Carregando lojas...</div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://167.114.30.91:3000/api';
+
+        async function carregarLojas() {
+            try {
+                const response = await fetch(`${API_URL}/empresas`);
+                const empresas = await response.json();
+
+                const lojasDiv = document.getElementById('lojas');
+                lojasDiv.innerHTML = '';
+
+                if (empresas.length === 0) {
+                    lojasDiv.innerHTML = '<p class="error">Nenhuma loja disponível</p>';
+                    return;
+                }
+
+                empresas.forEach(empresa => {
+                    const card = document.createElement('div');
+                    card.className = 'loja-card';
+                    card.innerHTML = `
+                        <h3>${empresa.nome_empresa}</h3>
+                        <p>📍 ${empresa.email}</p>
+                        <p>📞 ${empresa.telefone}</p>
+                        <a href="/loja.html?slug=${empresa.slug}">Ver Cardápio</a>
+                    `;
+                    lojasDiv.appendChild(card);
+                });
+            } catch (error) {
+                console.error('Erro ao carregar lojas:', error);
+                document.getElementById('lojas').innerHTML = `
+                    <div class="error">Erro ao carregar lojas. Tente mais tarde.</div>
+                `;
+            }
+        }
+
+        carregarLojas();
+    </script>
+</body>
+</html>
