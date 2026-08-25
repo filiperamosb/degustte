@@ -3,20 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Redirecionando...</title>
-    <script>
-        const path = window.location.pathname;
-        const segments = path.split('/').filter(s => s);
-
-        if (segments.length > 0 && !segments[segments.length - 1].includes('.')) {
-            const slug = segments[segments.length - 1];
-            window.location.href = '/empresa.html?slug=' + encodeURIComponent(slug);
-        } else {
-            window.location.href = '/';
-        }
-    </script>
+    <title>Cardápio Digital - DeGustte</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 20px; }
+        header { background: linear-gradient(135deg, #FF6B35 0%, #E74C3C 100%); color: white; padding: 40px 20px; border-radius: 12px; margin-bottom: 40px; text-align: center; }
+        header h1 { font-size: 32px; margin-bottom: 10px; }
+        .categorias { display: grid; gap: 40px; }
+        .categoria { background: white; border-radius: 12px; padding: 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .categoria-titulo { font-size: 24px; font-weight: 700; color: #FF6B35; margin-bottom: 10px; padding-bottom: 15px; border-bottom: 2px solid #FF6B35; }
+        .produtos { display: grid; gap: 20px; }
+        .produto { display: flex; justify-content: space-between; padding: 15px; background: #f9f9f9; border-radius: 8px; border-left: 4px solid #FF6B35; }
+        .produto-preco .preco { font-size: 20px; font-weight: 700; color: #FF6B35; }
+        .error { background: white; border-radius: 12px; padding: 40px; text-align: center; }
+        .loading { text-align: center; padding: 60px 20px; }
+    </style>
 </head>
 <body>
-    <p>Redirecionando...</p>
+    <div class="container">
+        <div id="content">
+            <div class="loading"><p>Carregando cardápio...</p></div>
+        </div>
+    </div>
+    <script>
+        async function carregarEmpresa() {
+            try {
+                let slug;
+                const params = new URLSearchParams(window.location.search);
+                slug = params.get('slug');
+                if (!slug) {
+                    const path = window.location.pathname;
+                    const segments = path.split('/').filter(p => p && !p.includes('.'));
+                    if (segments.length > 0) slug = segments[segments.length - 1];
+                }
+                if (!slug) { mostrarErro('Empresa não encontrada'); return; }
+                const response = await fetch(window.location.origin + '/data/empresas.json');
+                if (!response.ok) throw new Error('JSON not found');
+                const data = await response.json();
+                const empresa = data.empresas.find(e => e.slug === slug);
+                if (!empresa) { mostrarErro('Empresa não encontrada'); return; }
+                renderizarEmpresa(empresa);
+            } catch (erro) {
+                console.error('Erro:', erro);
+                mostrarErro('Erro ao carregar cardápio');
+            }
+        }
+        function renderizarEmpresa(empresa) {
+            const content = document.getElementById('content');
+            const categorias = empresa.cardapio?.categorias || [];
+            const produtos = empresa.cardapio?.produtos || [];
+            let html = '<header><h1>' + empresa.nomeEmpresa + '</h1></header><div class="categorias">';
+            categorias.forEach(cat => {
+                const catProdutos = produtos.filter(p => p.categoriaId === cat.id);
+                html += '<div class="categoria"><div class="categoria-titulo">' + cat.nome + '</div><div class="produtos">';
+                catProdutos.forEach(prod => {
+                    html += '<div class="produto"><div><h3>' + prod.nome + '</h3><p>' + prod.descricao + '</p></div>';
+                    html += '<div><div class="preco">R$ ' + prod.preco.toFixed(2) + '</div></div></div>';
+                });
+                html += '</div></div>';
+            });
+            html += '</div>';
+            content.innerHTML = html;
+        }
+        function mostrarErro(msg) { document.getElementById('content').innerHTML = '<div class="error"><h2>⚠️ Erro</h2><p>' + msg + '</p></div>'; }
+        window.addEventListener('load', carregarEmpresa);
+    </script>
 </body>
 </html>
