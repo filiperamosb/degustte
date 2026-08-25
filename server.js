@@ -7,10 +7,19 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors({
-  origin: ['https://www.degustte.com.br', 'http://localhost:8001', 'http://localhost:3000'],
-  credentials: true
-}));
+app.use(cors());
+
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+
+  next();
+});
 
 app.use(express.json());
 
@@ -38,7 +47,7 @@ app.post('/api/create-preference', async (req, res) => {
         failure: 'https://www.degustte.com.br/erro.html',
         pending: 'https://www.degustte.com.br/pendente.html'
       },
-      notification_url: 'https://degusttev-2--FilipeRamos.replit.app/webhook'
+      notification_url: 'https://deguuste.onrender.com/webhook'
     };
 
     const response = await axios.post(
