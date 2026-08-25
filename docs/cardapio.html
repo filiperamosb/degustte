@@ -275,6 +275,12 @@
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
+            position: sticky;
+            top: 0;
+            background: white;
+            padding: 15px 0;
+            z-index: 50;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
         .categoria-badge {
@@ -733,6 +739,14 @@
                 badges.forEach(b => {
                     b.classList.toggle('inactive', b.dataset.categoria !== categoriaId);
                 });
+
+                // Scroll para a categoria selecionada
+                setTimeout(() => {
+                    const grupoSelecionado = document.querySelector(`[data-categoria="${categoriaId}"]`);
+                    if (grupoSelecionado) {
+                        grupoSelecionado.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }, 100);
             }
         }
 
