@@ -141,13 +141,14 @@
                 <div class="card">
                     <div class="card-title">Empresas Criadas</div>
 
-                    <div style="margin-bottom: 20px;">
+                    <div style="margin-bottom: 20px; display: flex; gap: 10px;">
                         <input
                             type="text"
                             id="searchInput"
                             placeholder="🔍 Buscar por nome, email ou CNPJ..."
-                            style="width: 100%; padding: 10px; border: 2px solid var(--border); border-radius: 6px; font-size: 14px;"
+                            style="flex: 1; padding: 10px; border: 2px solid var(--border); border-radius: 6px; font-size: 14px;"
                         >
+                        <button class="btn btn-secondary" onclick="exportarEmpresas()">📥 Exportar JSON</button>
                     </div>
 
                     <div id="empresasList"></div>
@@ -356,11 +357,27 @@
 
                 localStorage.setItem('empresas', JSON.stringify(empresas));
 
-                alert(`✅ Empresa "${empresas[index].nomeEmpresa}" autorizada!\nURL: degustte.com.br/${empresas[index].slug}`);
+                // Exportar para arquivo JSON
+                exportarEmpresas();
+
+                alert(`✅ Empresa "${empresas[index].nomeEmpresa}" autorizada!\nURL: degustte.com.br/${empresas[index].slug}\n\n📝 Não esqueça de fazer commit das alterações no GitHub!`);
 
                 closeRevisao();
                 carregarEmpresas();
             }
+        }
+
+        function exportarEmpresas() {
+            const empresas = JSON.parse(localStorage.getItem('empresas') || '[]');
+            const autorizadas = empresas.filter(e => e.status === 'autorizada' || e.status === 'ativa');
+            const json = { empresas: autorizadas };
+            const blob = new Blob([JSON.stringify(json, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'empresas.json';
+            a.click();
+            URL.revokeObjectURL(url);
         }
 
         function bloquearEmpresa() {
