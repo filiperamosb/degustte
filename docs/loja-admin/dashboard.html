@@ -151,14 +151,16 @@
                 <h2>Banner e Avatar</h2>
                 <div class="two-columns">
                     <div class="form-group">
-                        <label>URL do Banner</label>
-                        <input type="url" id="bannerUrl" placeholder="https://...">
-                        <img id="previewBanner" class="upload-preview" style="display:none;" alt="Preview">
+                        <label>📸 Banner (anexo JPG/PNG)</label>
+                        <input type="file" id="bannerFile" accept="image/*">
+                        <img id="previewBanner" class="upload-preview" style="display:none; margin-top:10px;" alt="Preview">
+                        <small style="color:#999;">Máx 5MB</small>
                     </div>
                     <div class="form-group">
-                        <label>URL do Avatar</label>
-                        <input type="url" id="avatarUrl" placeholder="https://...">
-                        <img id="previewAvatar" class="upload-preview" style="display:none; border-radius: 50%; width: 150px; height: 150px; object-fit: cover;" alt="Preview">
+                        <label>👤 Avatar (anexo JPG/PNG)</label>
+                        <input type="file" id="avatarFile" accept="image/*">
+                        <img id="previewAvatar" class="upload-preview" style="display:none; border-radius: 50%; width: 150px; height: 150px; object-fit: cover; margin-top:10px;" alt="Preview">
+                        <small style="color:#999;">Máx 5MB</small>
                     </div>
                 </div>
             </div>
@@ -272,6 +274,56 @@
         let slug = null;
         let cardapioCache = { categorias: [], produtos: [] };
         let pagamentosLocais = [];
+        let bannerBase64 = null;
+        let avatarBase64 = null;
+
+        // Converter arquivo para base64
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                if (file.size > 5 * 1024 * 1024) {
+                    reject(new Error('Arquivo maior que 5MB'));
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // Handlers para file upload
+        document.addEventListener('DOMContentLoaded', () => {
+            const bannerInput = document.getElementById('bannerFile');
+            const avatarInput = document.getElementById('avatarFile');
+
+            if (bannerInput) {
+                bannerInput.addEventListener('change', async (e) => {
+                    if (e.target.files[0]) {
+                        try {
+                            bannerBase64 = await fileToBase64(e.target.files[0]);
+                            document.getElementById('previewBanner').src = bannerBase64;
+                            document.getElementById('previewBanner').style.display = 'block';
+                        } catch (error) {
+                            showToast('Erro: ' + error.message, true);
+                        }
+                    }
+                });
+            }
+
+            if (avatarInput) {
+                avatarInput.addEventListener('change', async (e) => {
+                    if (e.target.files[0]) {
+                        try {
+                            avatarBase64 = await fileToBase64(e.target.files[0]);
+                            document.getElementById('previewAvatar').src = avatarBase64;
+                            document.getElementById('previewAvatar').style.display = 'block';
+                        } catch (error) {
+                            showToast('Erro: ' + error.message, true);
+                        }
+                    }
+                });
+            }
+        });
 
         window.addEventListener('load', () => {
             const lojaAdmin = localStorage.getItem('lojaAdmin');
@@ -294,16 +346,22 @@
                 cardapioCache = loja.cardapio || { categorias: [], produtos: [] };
 
                 // Carregar perfil
-                document.getElementById('bannerUrl').value = loja.banner || '';
-                document.getElementById('avatarUrl').value = loja.avatar || '';
                 document.getElementById('bio').value = loja.bio || '';
                 document.getElementById('localizacao').value = loja.localizacao || '';
                 document.getElementById('whatsapp').value = loja.whatsapp || '';
                 document.getElementById('facebook').value = loja.facebook || '';
                 document.getElementById('instagram').value = loja.instagram || '';
 
-                if (loja.banner) document.getElementById('previewBanner').src = loja.banner;
-                if (loja.avatar) document.getElementById('previewAvatar').src = loja.avatar;
+                if (loja.banner) {
+                    document.getElementById('previewBanner').src = loja.banner;
+                    document.getElementById('previewBanner').style.display = 'block';
+                    bannerBase64 = loja.banner;
+                }
+                if (loja.avatar) {
+                    document.getElementById('previewAvatar').src = loja.avatar;
+                    document.getElementById('previewAvatar').style.display = 'block';
+                    avatarBase64 = loja.avatar;
+                }
 
                 pagamentosLocais = loja.pagamentos || [];
                 renderizarPagamentos();
@@ -382,8 +440,8 @@
             });
 
             const dados = {
-                banner: document.getElementById('bannerUrl').value,
-                avatar: document.getElementById('avatarUrl').value,
+                banner: bannerBase64 || null,
+                avatar: avatarBase64 || null,
                 bio: document.getElementById('bio').value,
                 localizacao: document.getElementById('localizacao').value,
                 whatsapp: document.getElementById('whatsapp').value,
@@ -571,21 +629,6 @@
             localStorage.removeItem('lojaAdmin');
             window.location.href = '/loja-admin/login.html';
         }
-
-        // Preview de imagens
-        document.getElementById('bannerUrl').addEventListener('change', (e) => {
-            if (e.target.value) {
-                document.getElementById('previewBanner').src = e.target.value;
-                document.getElementById('previewBanner').style.display = 'block';
-            }
-        });
-
-        document.getElementById('avatarUrl').addEventListener('change', (e) => {
-            if (e.target.value) {
-                document.getElementById('previewAvatar').src = e.target.value;
-                document.getElementById('previewAvatar').style.display = 'block';
-            }
-        });
     </script>
 </body>
 </html>
