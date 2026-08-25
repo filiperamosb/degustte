@@ -143,6 +143,7 @@
             <button class="tab-btn active" onclick="switchTab('perfil')">Perfil</button>
             <button class="tab-btn" onclick="switchTab('categorias')">Categorias</button>
             <button class="tab-btn" onclick="switchTab('produtos')">Produtos</button>
+            <button class="tab-btn" onclick="switchTab('pagamento')">💳 Pagamento</button>
         </div>
 
         <!-- TAB: PERFIL -->
@@ -282,6 +283,33 @@
             <div class="card">
                 <h2>Produtos Cadastrados</h2>
                 <div id="produtosList"></div>
+            </div>
+        </div>
+
+        <!-- TAB: PAGAMENTO -->
+        <div id="pagamento" class="tab-content">
+            <div class="card">
+                <h2>💳 Configurações de Pagamento</h2>
+                <p style="color:#666; margin-bottom:20px;">Configure aqui como seus clientes pagarão pelos pedidos via WhatsApp.</p>
+
+                <div class="form-group">
+                    <label>📱 WhatsApp da Loja (apenas números)</label>
+                    <input type="tel" id="pagWhatsapp" placeholder="5511999999999">
+                    <small style="color:#999;">Formato: código país + DDD + número</small>
+                </div>
+
+                <div class="form-group">
+                    <label>🔑 Chave PIX para Recebimento</label>
+                    <input type="text" id="chavePix" placeholder="Ex: abc12345-def6-7890-ghij-klmnopqrst">
+                    <small style="color:#999;">Pode ser CPF, CNPJ, telefone, email ou chave aleatória</small>
+                </div>
+
+                <div style="background:#f0f8ff; padding:15px; border-radius:8px; border-left:4px solid #3498db; margin-top:20px;">
+                    <strong>📝 Como funciona:</strong>
+                    <p style="margin:10px 0 0 0; font-size:0.9em; color:#555;">1. Cliente confirma pedido com endereço e telefone<br>2. Recebe link de WhatsApp com resumo do pedido<br>3. Sua chave PIX é compartilhada para pagamento<br>4. Você recebe a confirmação do cliente</p>
+                </div>
+
+                <button class="btn" onclick="salvarConfigPagamento()" style="width: 100%; margin-top: 20px;">💾 Salvar Configurações</button>
             </div>
         </div>
     </div>
@@ -875,6 +903,50 @@
             toast.style.display = 'block';
             setTimeout(() => toast.style.display = 'none', 3000);
         }
+
+        async function salvarConfigPagamento() {
+            const whatsapp = document.getElementById('pagWhatsapp').value;
+            const pix = document.getElementById('chavePix').value;
+
+            if (!whatsapp || !pix) {
+                showToast('Preencha WhatsApp e Chave PIX', true);
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/empresas/${slug}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ whatsapp, pix })
+                });
+                if (response.ok) {
+                    showToast('✅ Configurações de pagamento salvas!');
+                } else {
+                    showToast('Erro ao salvar', true);
+                }
+            } catch (error) {
+                showToast('Erro: ' + error.message, true);
+            }
+        }
+
+        // Carregar config de pagamento ao abrir dashboard
+        window.addEventListener('load', async () => {
+            const lojaAdmin = localStorage.getItem('lojaAdmin');
+            if (!lojaAdmin) return;
+            const dados = JSON.parse(lojaAdmin);
+            slug = dados.slug;
+
+            setTimeout(async () => {
+                try {
+                    const response = await fetch(`${API_URL}/empresas/${slug}`);
+                    const loja = await response.json();
+                    if (loja.whatsapp) document.getElementById('pagWhatsapp').value = loja.whatsapp;
+                    if (loja.pix) document.getElementById('chavePix').value = loja.pix;
+                } catch (error) {
+                    console.error('Erro ao carregar config:', error);
+                }
+            }, 500);
+        });
 
         function logout() {
             localStorage.removeItem('lojaAdmin');

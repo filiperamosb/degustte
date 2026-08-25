@@ -646,6 +646,35 @@
         </div>
     </div>
 
+    <!-- Modal Checkout -->
+    <div id="modalCheckout" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:999; overflow-y:auto; padding:20px 0;">
+        <div style="background:white; margin:40px auto; padding:30px; border-radius:10px; max-width:600px; width:90%; margin-bottom:100px;">
+            <button onclick="fecharCheckout()" style="float:right; background:none; border:none; font-size:24px; cursor:pointer;">✕</button>
+            <h2 style="color:#27ae60; margin-bottom:10px;">📋 Finalizar Pedido</h2>
+            <p style="color:#666; margin-bottom:20px; font-size:0.9em;">Preencha seus dados para receber o pedido e a chave PIX</p>
+
+            <div style="background:#f9f9f9; padding:15px; border-radius:8px; margin-bottom:20px;">
+                <h3 style="color:#333; margin-bottom:10px; font-size:0.95em;">📦 Seu Pedido:</h3>
+                <div id="checkoutResumo" style="max-height:200px; overflow-y:auto;"></div>
+                <div style="border-top:1px solid #ddd; padding-top:10px; margin-top:10px;">
+                    <strong style="color:#27ae60; font-size:1.1em;">Total: <span id="checkoutTotal">R$ 0.00</span></strong>
+                </div>
+            </div>
+
+            <div style="margin-bottom:20px;">
+                <label style="display:block; font-weight:bold; margin-bottom:8px;">📍 Endereço de Entrega:</label>
+                <textarea id="checkoutEndereco" placeholder="Rua, número, complemento, bairro, cidade..." style="width:100%; padding:10px; border:1px solid #ddd; border-radius:6px; font-family:inherit; resize:vertical; min-height:70px;"></textarea>
+            </div>
+
+            <div style="margin-bottom:20px;">
+                <label style="display:block; font-weight:bold; margin-bottom:8px;">📱 Seu Telefone/WhatsApp:</label>
+                <input type="tel" id="checkoutTelefone" placeholder="(11) 99999-9999" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:6px; font-family:inherit;">
+            </div>
+
+            <button onclick="enviarPedidoWhatsapp()" style="width:100%; background:#25d366; color:white; border:none; padding:15px; border-radius:8px; font-size:1.1em; font-weight:bold; cursor:pointer;">💬 Enviar via WhatsApp</button>
+        </div>
+    </div>
+
     <script>
         const API_URL = 'https://api.degustte.com.br/api';
         let slug = null;
@@ -1003,7 +1032,103 @@
                 alert('Sua sacola está vazia!');
                 return;
             }
-            alert('🚀 Sistema de pagamento em breve! Por enquanto sua sacola foi salva.');
+            abrirCheckout();
+        }
+
+        function abrirCheckout() {
+            document.getElementById('modalCheckout').style.display = 'flex';
+
+            let resumo = '<div style="font-size:0.9em;">';
+            let total = 0;
+            sacola.forEach(item => {
+                const precoFinal = (item.preco - (item.preco * (item.desconto || 0) / 100));
+                const subtotal = precoFinal * item.quantidade;
+                const descAdc = item.adicionais.reduce((s, a) => s + (a.preco || 0), 0) * item.quantidade;
+                const itemTotal = subtotal + descAdc;
+                total += itemTotal;
+
+                let linha = `${item.quantidade}x ${item.nome} - R$ ${itemTotal.toFixed(2)}`;
+                if (item.adicionais && item.adicionais.length > 0) {
+                    linha += '<br><small style="color:#999;"> Adicionais: ' + item.adicionais.map(a => a.nome).join(', ') + '</small>';
+                }
+                if (item.observacoes) {
+                    linha += '<br><small style="color:#999;"> Obs: ' + item.observacoes + '</small>';
+                }
+                resumo += '<div style="padding:8px; border-bottom:1px solid #eee;">' + linha + '</div>';
+            });
+            resumo += '</div>';
+
+            document.getElementById('checkoutResumo').innerHTML = resumo;
+            document.getElementById('checkoutTotal').textContent = 'R$ ' + total.toFixed(2);
+        }
+
+        function fecharCheckout() {
+            document.getElementById('modalCheckout').style.display = 'none';
+        }
+
+        async function enviarPedidoWhatsapp() {
+            const endereco = document.getElementById('checkoutEndereco').value.trim();
+            const telefone = document.getElementById('checkoutTelefone').value.trim();
+
+            if (!endereco || !telefone) {
+                alert('Preencha endereço e telefone!');
+                return;
+            }
+
+            // Calcular total
+            let total = 0;
+            let detalhes = '*🛒 NOVO PEDIDO*\n\n';
+
+            sacola.forEach(item => {
+                const precoFinal = (item.preco - (item.preco * (item.desconto || 0) / 100));
+                const subtotal = precoFinal * item.quantidade;
+                const descAdc = item.adicionais.reduce((s, a) => s + (a.preco || 0), 0) * item.quantidade;
+                const itemTotal = subtotal + descAdc;
+                total += itemTotal;
+
+                detalhes += `${item.quantidade}x *${item.nome}* - R$ ${itemTotal.toFixed(2)}\n`;
+                if (item.adicionais && item.adicionais.length > 0) {
+                    detalhes += `   📌 Adicionais: ${item.adicionais.map(a => a.nome).join(', ')}\n`;
+                }
+                if (item.observacoes) {
+                    detalhes += `   📝 Obs: ${item.observacoes}\n`;
+                }
+            });
+
+            detalhes += `\n*Total: R$ ${total.toFixed(2)}*\n\n`;
+            detalhes += `📍 *Endereço:* ${endereco}\n`;
+            detalhes += `📱 *Telefone:* ${telefone}\n`;
+
+            // Buscar dados da loja (WhatsApp e PIX)
+            try {
+                const resp = await fetch(`${API_URL}/empresas/${slug}`);
+                const loja = await resp.json();
+
+                if (!loja.whatsapp) {
+                    alert('❌ A loja ainda não configurou WhatsApp. Contacte o proprietário.');
+                    return;
+                }
+
+                detalhes += `\n*Para confirmar pagamento, utilize a chave PIX:*\n`;
+                detalhes += `\`${loja.pix || 'PIX não configurado'}\`\n`;
+                detalhes += `\n_(Confirme o pagamento neste chat)_`;
+
+                // Criar link de WhatsApp
+                const msg = encodeURIComponent(detalhes);
+                const link = `https://wa.me/${loja.whatsapp}?text=${msg}`;
+
+                // Limpar sacola
+                localStorage.removeItem('sacola');
+                sacola = [];
+                atualizarSacola();
+
+                // Fechar modal e abrir WhatsApp
+                fecharCheckout();
+                window.open(link, '_blank');
+                alert('✅ Pedido enviado! Aguarde confirmação via WhatsApp.');
+            } catch (error) {
+                alert('Erro ao processar: ' + error.message);
+            }
         }
 
         // Carregar sacola ao iniciar

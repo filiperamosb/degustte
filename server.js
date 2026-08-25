@@ -40,6 +40,8 @@ const pool = new Pool({
     await pool.query(`ALTER TABLE empresas ADD COLUMN IF NOT EXISTS localizacao VARCHAR(255)`).catch(() => {});
     // Whatsapp
     await pool.query(`ALTER TABLE empresas ADD COLUMN IF NOT EXISTS whatsapp VARCHAR(20)`).catch(() => {});
+    // PIX
+    await pool.query(`ALTER TABLE empresas ADD COLUMN IF NOT EXISTS pix TEXT`).catch(() => {});
     // Facebook
     await pool.query(`ALTER TABLE empresas ADD COLUMN IF NOT EXISTS facebook VARCHAR(255)`).catch(() => {});
     // Instagram
@@ -135,15 +137,35 @@ app.patch('/api/empresas/:id/autorizar', async (req, res) => {
   }
 });
 
+// Atualizar config de pagamento (whatsapp, pix)
+app.patch('/api/empresas/:slug', async (req, res) => {
+  try {
+    const { slug } = req.params;
+    const { whatsapp, pix } = req.body;
+
+    const result = await pool.query(
+      'UPDATE empresas SET whatsapp = COALESCE($1, whatsapp), pix = COALESCE($2, pix) WHERE slug = $3 RETURNING *',
+      [whatsapp || null, pix || null, slug]
+    );
+
+    if (result.rows.length === 0) return res.status(404).json({ erro: 'Empresa não encontrada' });
+    const { loja_senha, ...empresaSemSenha } = result.rows[0];
+    res.json({ ok: true, empresa: empresaSemSenha });
+  } catch (erro) {
+    console.error(erro);
+    res.status(400).json({ erro: erro.message });
+  }
+});
+
 // Editar perfil da loja (avatar, banner, redes sociais, etc)
 app.patch('/api/empresas/:slug/perfil', async (req, res) => {
   try {
     const { slug } = req.params;
-    const { avatar, banner, bio, localizacao, whatsapp, facebook, instagram, horarios, pagamentos } = req.body;
+    const { avatar, banner, bio, localizacao, whatsapp, facebook, instagram, horarios, pagamentos, pix } = req.body;
 
     const result = await pool.query(
-      `UPDATE empresas SET avatar = $1, banner = $2, bio = $3, localizacao = $4, whatsapp = $5, facebook = $6, instagram = $7, horarios = $8, pagamentos = $9 WHERE slug = $10 RETURNING *`,
-      [avatar, banner, bio, localizacao, whatsapp, facebook, instagram, JSON.stringify(horarios), JSON.stringify(pagamentos), slug]
+      `UPDATE empresas SET avatar = $1, banner = $2, bio = $3, localizacao = $4, whatsapp = $5, facebook = $6, instagram = $7, horarios = $8, pagamentos = $9, pix = $10 WHERE slug = $11 RETURNING *`,
+      [avatar, banner, bio, localizacao, whatsapp, facebook, instagram, JSON.stringify(horarios), JSON.stringify(pagamentos), pix, slug]
     );
 
     if (result.rows.length === 0) return res.status(404).json({ erro: 'Empresa não encontrada' });
