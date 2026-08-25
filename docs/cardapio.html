@@ -576,12 +576,19 @@
         </div>
     </div>
 
+    <!-- Modal Imagem -->
+    <div id="modalImagem" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:1000; display:flex; align-items:center; justify-content:center;">
+        <button onclick="fecharModalImagem()" style="position:absolute; top:20px; right:20px; background:white; border:none; font-size:30px; cursor:pointer; width:50px; height:50px; border-radius:50%;">✕</button>
+        <img id="modalImagemImg" style="max-width:90vw; max-height:90vh; object-fit:contain;">
+    </div>
+
     <!-- Modal Produto -->
     <div id="modalProduto" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:999; overflow-y:auto;">
         <div style="background:white; margin:50px auto; padding:30px; border-radius:10px; max-width:500px; width:90%;">
             <button onclick="fecharModalProduto()" style="float:right; background:none; border:none; font-size:24px; cursor:pointer;">✕</button>
             <h2 id="modalProdNome" style="color:#27ae60; margin-bottom:10px;"></h2>
-            <p id="modalProdDesc" style="color:#666; margin-bottom:20px; line-height:1.5;"></p>
+            <p id="modalProdDesc" style="color:#666; margin-bottom:20px; line-height:1.5; font-size:0.95em;"></p>
+            <div id="modalProdImagem" style="width:100%; height:200px; background:#f0f0f0; border-radius:8px; margin-bottom:20px; cursor:pointer; background-size:cover; background-position:center; background-repeat:no-repeat;" onclick="abrirImagemGrande()"></div>
 
             <div style="background:#f9f9f9; padding:15px; border-radius:8px; margin-bottom:20px;">
                 <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
@@ -812,7 +819,7 @@
 
             quantidadeModal = 1;
             document.getElementById('modalProdNome').textContent = corrigirCaracteres(produtoSelecionado.nome);
-            document.getElementById('modalProdDesc').textContent = produtoSelecionado.descricao ? corrigirCaracteres(produtoSelecionado.descricao) : 'Sem descrição';
+            document.getElementById('modalProdDesc').textContent = corrigirCaracteres(produtoSelecionado.descricao || 'Sem descrição');
 
             const preco = parseFloat(produtoSelecionado.preco).toFixed(2);
             const desconto = produtoSelecionado.desconto ? (preco * (1 - produtoSelecionado.desconto / 100)).toFixed(2) : preco;
@@ -820,21 +827,43 @@
 
             document.getElementById('modalQuantidade').textContent = '1';
 
+            // Imagem
+            const imgContainer = document.getElementById('modalProdImagem');
+            if (produtoSelecionado.imagem) {
+                imgContainer.style.backgroundImage = `url('${produtoSelecionado.imagem}')`;
+                imgContainer.style.cursor = 'pointer';
+            } else {
+                imgContainer.style.backgroundImage = 'none';
+                imgContainer.style.background = '#f0f0f0';
+                imgContainer.textContent = 'Sem imagem';
+            }
+
             // Adicionais
-            const adicionaisHtml = produtoSelecionado.adicionais && produtoSelecionado.adicionais.length > 0
-                ? `<div style="background:#f9f9f9; padding:15px; border-radius:8px;">
+            let adicionaisHtml = '';
+            if (produtoSelecionado.adicionais && produtoSelecionado.adicionais.length > 0) {
+                adicionaisHtml = `<div style="background:#f9f9f9; padding:15px; border-radius:8px; margin-bottom:20px;">
                     <label style="font-weight:bold; display:block; margin-bottom:10px;">Adicionais:</label>
                     ${produtoSelecionado.adicionais.map((ad, idx) => `
                         <div style="display:flex; align-items:center; margin-bottom:8px;">
                             <input type="checkbox" id="ad${idx}" data-preco="${ad.preco}" style="width:18px; height:18px;">
-                            <label for="ad${idx}" style="margin-left:10px; cursor:pointer;">${ad.nome} <span style="color:#27ae60;">+R$ ${parseFloat(ad.preco).toFixed(2)}</span></label>
+                            <label for="ad${idx}" style="margin-left:10px; cursor:pointer; flex:1;">${ad.nome} <span style="color:#27ae60; float:right;">+R$ ${parseFloat(ad.preco).toFixed(2)}</span></label>
                         </div>
                     `).join('')}
-                  </div>`
-                : '';
+                </div>`;
+            }
             document.getElementById('adicionaisContainer').innerHTML = adicionaisHtml;
 
             document.getElementById('modalProduto').style.display = 'block';
+        }
+
+        function abrirImagemGrande() {
+            if (!produtoSelecionado || !produtoSelecionado.imagem) return;
+            document.getElementById('modalImagemImg').src = produtoSelecionado.imagem;
+            document.getElementById('modalImagem').style.display = 'flex';
+        }
+
+        function fecharModalImagem() {
+            document.getElementById('modalImagem').style.display = 'none';
         }
 
         function fecharModalProduto() {
