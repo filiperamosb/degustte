@@ -2,6 +2,10 @@
 import cors from 'cors';
 import dotenv from 'dotenv';
 import pg from 'pg';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 dotenv.config();
 
@@ -56,6 +60,22 @@ app.get('/api/empresas/:slug', async (req, res) => {
     res.json(result.rows[0]);
   } catch (erro) {
     res.status(500).json({ erro: erro.message });
+  }
+});
+
+app.patch('/api/empresas/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { nome_empresa, email, telefone, cnpj, plano, slug } = req.body;
+    const result = await pool.query(
+      'UPDATE empresas SET nome_empresa = $1, email = $2, telefone = $3, cnpj = $4, plano = $5, slug = $6 WHERE id = $7 RETURNING *',
+      [nome_empresa, email, telefone, cnpj, plano, slug, id]
+    );
+    if (result.rows.length === 0) return res.status(404).json({ erro: 'Empresa não encontrada' });
+    res.json({ ok: true, empresa: result.rows[0] });
+  } catch (erro) {
+    console.error(erro);
+    res.status(400).json({ erro: erro.message });
   }
 });
 
@@ -129,12 +149,14 @@ app.get('/api/health', async (req, res) => {
   }
 });
 
+// SPA fallback - rotas como /alameda22 servem a página de loja
+app.get(/^\/(?!api|admin).*/, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'loja.html'));
+});
+
 // 404
 app.use((req, res) => {
-  if (req.path.startsWith('/api')) {
-    return res.status(404).json({ erro: 'Endpoint não encontrado' });
-  }
-  res.sendFile('public/404.html');
+  res.status(404).json({ erro: 'Endpoint não encontrado' });
 });
 
 const PORT = process.env.PORT || 3000;

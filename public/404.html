@@ -156,9 +156,14 @@
 
             try {
                 const response = await fetch(`${API_URL}/empresas/${slug}`);
+                if (!response.ok) {
+                    document.getElementById('info').innerHTML = '<h1>Loja não encontrada</h1>';
+                    document.getElementById('info').classList.remove('loading');
+                    document.getElementById('cardapio').innerHTML = '<div class="error">Esta loja não existe ou ainda não foi autorizada.</div>';
+                    return;
+                }
                 const empresa = await response.json();
 
-                // Atualizar header
                 const headerDiv = document.getElementById('info');
                 headerDiv.innerHTML = `
                     <div>
@@ -168,7 +173,6 @@
                 `;
                 headerDiv.classList.remove('loading');
 
-                // Carregar cardápio
                 const cardapio = empresa.cardapio || { categorias: [], produtos: [] };
                 const cardapioDiv = document.getElementById('cardapio');
 
@@ -211,10 +215,7 @@
             }
         }
 
-        // Carregar ao abrir página
         carregarCardapio();
-
-        // Atualizar a cada 10 segundos (opcional)
         setInterval(carregarCardapio, 10000);
     </script>
 </body>

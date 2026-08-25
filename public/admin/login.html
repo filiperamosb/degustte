@@ -5,12 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - DeGustte</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -20,7 +15,6 @@
             justify-content: center;
             padding: 20px;
         }
-
         .login-container {
             background: white;
             border-radius: 10px;
@@ -29,47 +23,32 @@
             width: 100%;
             box-shadow: 0 10px 40px rgba(0,0,0,0.2);
         }
-
         .login-container h1 {
             color: #667eea;
             margin-bottom: 10px;
             text-align: center;
             font-size: 1.8em;
         }
-
         .login-container p {
             color: #666;
             text-align: center;
             margin-bottom: 30px;
         }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
+        .form-group { margin-bottom: 20px; }
         label {
             display: block;
             color: #333;
             margin-bottom: 8px;
             font-weight: 500;
         }
-
-        input[type="text"],
-        input[type="password"] {
+        input[type="text"], input[type="password"] {
             width: 100%;
             padding: 12px;
             border: 1px solid #ddd;
             border-radius: 5px;
             font-size: 1em;
-            transition: border-color 0.3s;
         }
-
-        input[type="text"]:focus,
-        input[type="password"]:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
+        input:focus { outline: none; border-color: #667eea; }
         button {
             width: 100%;
             padding: 12px;
@@ -82,11 +61,7 @@
             cursor: pointer;
             transition: background 0.3s;
         }
-
-        button:hover {
-            background: #764ba2;
-        }
-
+        button:hover { background: #764ba2; }
         .error {
             background: #ff6b6b;
             color: white;
@@ -95,12 +70,7 @@
             margin-bottom: 20px;
             display: none;
         }
-
-        .loading {
-            display: none;
-            text-align: center;
-            color: #667eea;
-        }
+        .loading { display: none; text-align: center; color: #667eea; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -113,18 +83,17 @@
 
             <div class="form-group">
                 <label for="email">Email:</label>
-                <input type="text" id="email" name="email" value="admin@degustte.com" required>
+                <input type="text" id="email" name="email" required>
             </div>
 
             <div class="form-group">
                 <label for="senha">Senha:</label>
-                <input type="password" id="senha" name="senha" value="admin123" required>
+                <input type="password" id="senha" name="senha" required>
             </div>
 
             <button type="submit">Entrar</button>
+            <div class="loading" id="loading">Carregando...</div>
         </form>
-
-        <div class="loading" id="loading">Carregando...</div>
     </div>
 
     <script>
@@ -141,9 +110,7 @@
 
                 const response = await fetch(`${API_URL}/admin/login`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, senha })
                 });
 
@@ -157,7 +124,7 @@
                 }
             } catch (error) {
                 console.error('Erro:', error);
-                showError('Erro ao conectar. Verifique a URL da API.');
+                showError('Erro ao conectar com o servidor');
             } finally {
                 document.getElementById('loading').style.display = 'none';
             }
