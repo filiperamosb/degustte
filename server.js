@@ -1,5 +1,5 @@
 import express from 'express';
-import stripe from 'stripe';
+import axios from 'axios';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -10,8 +10,8 @@ app.use(express.json());
 // CORS Middleware
 app.use((req, res, next) => {
   res.set('Access-Control-Allow-Origin', '*');
-  res.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH');
-  res.set('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  res.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.set('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
   res.set('Access-Control-Max-Age', '86400');
 
   if (req.method === 'OPTIONS') {
@@ -22,68 +22,54 @@ app.use((req, res, next) => {
 });
 
 const PORT = process.env.PORT || 3000;
-const stripeClient = stripe(process.env.STRIPE_SECRET_KEY);
+const ASAAS_API_KEY = process.env.ASAAS_API_KEY;
 
-// Criar sessão de pagamento Stripe
-app.post('/api/create-checkout-session', async (req, res) => {
+// Criar link de pagamento Asaas
+app.post('/api/create-payment-link', async (req, res) => {
   try {
     const { nomeEmpresa, email, telefone, valor, dados } = req.body;
 
-    const session = await stripeClient.checkout.sessions.create({
-      payment_method_types: ['card', 'boleto', 'pix'],
-      line_items: [
-        {
-          price_data: {
-            currency: 'brl',
-            product_data: {
-              name: `Plano DeGustte - ${nomeEmpresa}`,
-              description: `Empresa: ${nomeEmpresa}\nEmail: ${email}\nTelefone: ${telefone}`
-            },
-            unit_amount: Math.round(valor * 100)
-          },
-          quantity: 1
-        }
-      ],
-      metadata: {
-        nomeEmpresa,
-        email,
-        telefone,
-        dados: JSON.stringify(dados)
+    const response = await axios.post(
+      'https://api.asaas.com/v3/paymentLinks',
+      {
+        billingType: 'UNDEFINED',
+        customer: email,
+        dueDate: new Date().toISOString().split('T')[0],
+        value: valor,
+        description: `Plano DeGustte - ${nomeEmpresa}`,
+        externalReference: `degustte-${Date.now()}`,
+        allowedPaymentMethods: ['PIX', 'CREDIT_CARD', 'BOLETO']
       },
-      mode: 'payment',
-      success_url: 'http://localhost:8001/sucesso.html',
-      cancel_url: 'http://localhost:8001/erro.html'
-    });
+      {
+        headers: {
+          'access_token': ASAAS_API_KEY,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
 
-    console.log('Sessão Stripe criada:', session.id);
+    console.log('Link de pagamento criado:', response.data.id);
 
     res.json({
-      sessionId: session.id,
-      publishableKey: process.env.STRIPE_PUBLISHABLE_KEY
+      paymentLink: response.data.url,
+      paymentId: response.data.id
     });
   } catch (error) {
-    console.error('Erro ao criar sessão:', error.message);
+    console.error('Erro ao criar link de pagamento:', error.response?.data || error.message);
     res.status(500).json({
-      error: error.message
+      error: error.response?.data?.message || error.message
     });
   }
 });
 
 // Webhook para confirmação de pagamento
-app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
-  const sig = req.headers['stripe-signature'];
-
+app.post('/webhook', express.json(), async (req, res) => {
   try {
-    const event = stripeClient.webhooks.constructEvent(
-      req.body,
-      sig,
-      process.env.STRIPE_WEBHOOK_SECRET || 'whsec_test'
-    );
+    const { event, payment } = req.body;
 
-    if (event.type === 'checkout.session.completed') {
-      const session = event.data.object;
-      console.log('✅ Pagamento confirmado:', session.id);
-      console.log('Metadados:', session.metadata);
+    if (event === 'PAYMENT_CONFIRMED') {
+      console.log('✅ Pagamento confirmado:', payment.id);
+      console.log('Referência:', payment.externalReference);
     }
 
     res.json({ received: true });
@@ -95,5 +81,5 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res)
 
 app.listen(PORT, () => {
   console.log(`🚀 Servidor rodando na porta ${PORT}`);
-  console.log(`API disponível em /api/create-checkout-session`);
+  console.log(`API disponível em /api/create-payment-link`);
 });

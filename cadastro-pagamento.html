@@ -343,13 +343,11 @@
         </div>
     </div>
 
-    <script src="https://js.stripe.com/v3/"></script>
     <script>
         const form = document.getElementById('empresaForm');
         const submitBtn = document.getElementById('submitBtn');
         const loading = document.getElementById('loading');
         const errorMessage = document.getElementById('errorMessage');
-        const stripe = Stripe('pk_test_51ThWnZDUZBwcZBvOGewalxFsZpzQoy0EksvvgSzd2hhHkU2S0YKeWu0GL7D9HhPyQRlezAIxKJwHOo9WTZrPlvn800xqxwwLXt');
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -363,7 +361,7 @@
                 const dados = Object.fromEntries(formData);
 
                 const response = await fetch(
-                    'http://localhost:3000/api/create-checkout-session',
+                    'http://localhost:3000/api/create-payment-link',
                     {
                         method: 'POST',
                         headers: {
@@ -380,23 +378,19 @@
                 );
 
                 if (!response.ok) {
-                    throw new Error('Erro ao criar sessão de pagamento');
+                    throw new Error('Erro ao criar link de pagamento');
                 }
 
                 const result = await response.json();
 
-                if (result.sessionId) {
+                if (result.paymentLink) {
+                    // Salvar dados do formulário
                     localStorage.setItem('empresaData', JSON.stringify(dados));
 
-                    const { error } = await stripe.redirectToCheckout({
-                        sessionId: result.sessionId
-                    });
-
-                    if (error) {
-                        throw new Error(error.message);
-                    }
+                    // Redirecionar para link de pagamento Asaas
+                    window.location.href = result.paymentLink;
                 } else {
-                    throw new Error('ID da sessão não recebido');
+                    throw new Error('Link de pagamento não recebido');
                 }
 
             } catch (erro) {
