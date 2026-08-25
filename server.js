@@ -29,7 +29,7 @@ app.post('/api/create-preference', async (req, res) => {
       },
       external_reference: `degustte-${Date.now()}`,
       back_urls: {
-        success: 'http://localhost:8001/sucesso.html?external_reference={external_reference}',
+        success: 'http://localhost:8001/sucesso.html',
         failure: 'http://localhost:8001/erro.html',
         pending: 'http://localhost:8001/pendente.html'
       },
