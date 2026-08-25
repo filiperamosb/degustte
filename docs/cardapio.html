@@ -11,175 +11,291 @@
         .back-link { display: inline-block; padding: 12px 20px; color: #27ae60; text-decoration: none; margin: 15px 0 0 15px; font-weight: 600; }
         .back-link:hover { text-decoration: underline; }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
+        /* Banner */
+        .banner-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 200px;
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+            color: white;
+            font-size: 3.5em;
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
         }
 
-        .header {
-            background: white;
-            padding: 30px 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            margin-bottom: 30px;
+        .banner-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+        }
+
+        .banner-text {
+            position: relative;
+            z-index: 10;
             text-align: center;
         }
 
-        .logo {
-            font-size: 2em;
-            font-weight: bold;
-            color: #27ae60;
-            margin-bottom: 10px;
+        /* Header */
+        .header {
+            background: white;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            margin-top: -50px;
+            flex-shrink: 0;
+        }
+
+        .header-info {
+            flex: 1;
         }
 
         .nome-loja {
-            font-size: 1.8em;
+            font-size: 1.3em;
             font-weight: bold;
             color: #1a1a1a;
         }
 
-        .cardapio-section {
+        .social-links {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .social-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            text-decoration: none;
+            font-size: 16px;
+            border: 1px solid #27ae60;
+            color: #27ae60;
+            transition: all 0.3s;
+        }
+
+        .social-btn:hover { background: #27ae60; color: white; }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Categorias */
+        .categorias-section {
             background: white;
-            border-radius: 10px;
-            padding: 30px;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
 
-        .categoria {
+        .categorias-title {
+            font-weight: bold;
+            color: #27ae60;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .categorias-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .categoria-badge {
+            background: #27ae60;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .categoria-badge:hover {
+            background: #229954;
+        }
+
+        .categoria-badge.inactive {
+            background: white;
+            color: #27ae60;
+            border: 1px solid #27ae60;
+        }
+
+        /* Cardápio Section */
+        .cardapio-section {
+            background: white;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .categoria-group {
             margin-bottom: 40px;
         }
 
         .categoria-titulo {
-            font-size: 1.5em;
+            font-size: 1.2em;
             font-weight: bold;
-            color: #1a1a1a;
-            margin-bottom: 10px;
+            color: #27ae60;
+            margin-bottom: 15px;
             padding-bottom: 10px;
-            border-bottom: 3px solid #27ae60;
-        }
-
-        .categoria-descricao {
-            color: #666;
-            margin-bottom: 20px;
-            font-size: 0.95em;
+            border-bottom: 2px solid #27ae60;
         }
 
         .produtos-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            grid-template-columns: repeat(2, 1fr);
             gap: 20px;
         }
 
         .produto {
+            display: flex;
+            gap: 15px;
+            padding: 15px;
             background: #f9f9f9;
             border-radius: 8px;
-            padding: 20px;
-            border: 1px solid #e0e0e0;
             transition: all 0.3s;
         }
 
         .produto:hover {
-            box-shadow: 0 5px 20px rgba(39, 174, 96, 0.2);
-            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .produto-img {
+            width: 100px;
+            height: 100px;
+            border-radius: 8px;
+            object-fit: cover;
+            flex-shrink: 0;
+            background: #e0e0e0;
+        }
+
+        .produto-info {
+            flex: 1;
         }
 
         .produto-nome {
             font-weight: bold;
             color: #1a1a1a;
-            margin-bottom: 8px;
-            font-size: 1.1em;
+            margin-bottom: 5px;
         }
 
         .produto-desc {
             color: #666;
-            font-size: 0.9em;
-            margin-bottom: 12px;
-            line-height: 1.5;
+            font-size: 0.85em;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .produto-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 8px;
         }
 
         .produto-preco {
             color: #27ae60;
             font-weight: bold;
-            font-size: 1.3em;
+            font-size: 0.95em;
         }
 
-        .produto.indisponivel {
-            opacity: 0.6;
-            background: #f0f0f0;
+        .produto-like {
+            background: none;
+            border: none;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: all 0.3s;
         }
 
-        .indisponivel-label {
-            display: inline-block;
-            background: #999;
-            color: white;
-            padding: 4px 12px;
-            border-radius: 4px;
-            font-size: 0.75em;
-            margin-top: 8px;
+        .produto-like:hover {
+            transform: scale(1.2);
         }
 
         .loading {
             text-align: center;
             padding: 40px;
             color: #27ae60;
-            font-size: 1.2em;
         }
 
         .error {
             text-align: center;
             padding: 40px;
             color: #e74c3c;
-            font-size: 1.2em;
         }
 
         @media (max-width: 768px) {
             .produtos-grid {
-                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-                gap: 12px;
+                grid-template-columns: 1fr;
             }
 
-            .produto {
-                padding: 12px;
+            .banner-section {
+                font-size: 2.2em;
+                height: 150px;
             }
 
-            .nome-loja {
-                font-size: 1.3em;
+            .header {
+                flex-direction: column;
+                text-align: center;
             }
 
-            .categoria-titulo {
-                font-size: 1.2em;
+            .avatar {
+                margin-top: -40px;
             }
 
-            .produto-nome {
-                font-size: 0.9em;
+            .categorias-list {
+                justify-content: center;
             }
 
-            .produto-desc {
+            .categoria-badge {
                 font-size: 0.8em;
-            }
-
-            .produto-preco {
-                font-size: 1em;
+                padding: 6px 12px;
             }
         }
 
         @media (max-width: 480px) {
-            .produtos-grid {
-                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            .produto {
                 gap: 10px;
             }
 
-            .produto {
-                padding: 10px;
+            .produto-img {
+                width: 80px;
+                height: 80px;
             }
 
             .header {
-                padding: 20px 15px;
+                padding: 15px;
             }
 
             .cardapio-section {
                 padding: 15px;
+            }
+
+            .categoria-titulo {
+                font-size: 1em;
             }
         }
     </style>
@@ -187,10 +303,28 @@
 <body>
     <a href="" class="back-link" id="backLink">← Voltar para loja</a>
 
-    <div class="container">
-        <div class="header">
-            <div class="logo">🍽️ DeGustte</div>
+    <div class="banner-section">
+        <img id="bannerImg" class="banner-img" alt="Banner" style="display:none;">
+        <div class="banner-text" id="bannerText">DeGustte</div>
+    </div>
+
+    <div class="header">
+        <img id="avatarImg" class="avatar" alt="Avatar" style="display:none;">
+        <div class="header-info">
             <div class="nome-loja" id="nomeLoja">Carregando...</div>
+            <div class="social-links">
+                <a href="#" class="social-btn" id="btnHome" style="display:none;" target="_blank">🏠</a>
+                <a href="#" class="social-btn instagram" id="btnInstagram" style="display:none;" target="_blank">📷</a>
+                <a href="#" class="social-btn whatsapp" id="btnWhatsapp" style="display:none;" target="_blank">💬</a>
+                <a href="#" class="social-btn" id="btnSearch" style="display:none;" onclick="return false">🔍</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="categorias-section">
+            <div class="categorias-title">Categorias</div>
+            <div class="categorias-list" id="categoriasList"></div>
         </div>
 
         <div class="cardapio-section" id="cardapioContainer">
@@ -201,6 +335,8 @@
     <script>
         const API_URL = 'https://api.degustte.com.br/api';
         let slug = null;
+        let lojaData = null;
+        let categoriaSelecionada = null;
 
         window.addEventListener('load', async () => {
             slug = window.location.pathname.split('/')[1] || 'restaurantealameda22';
@@ -213,9 +349,34 @@
                 const response = await fetch(`${API_URL}/empresas/${slug}`);
                 if (!response.ok) throw new Error('Loja não encontrada');
 
-                const loja = await response.json();
-                document.getElementById('nomeLoja').textContent = loja.nome_empresa;
-                renderizarCardapio(loja);
+                lojaData = await response.json();
+                document.getElementById('nomeLoja').textContent = lojaData.nome_empresa;
+                document.getElementById('bannerText').textContent = lojaData.nome_empresa.toUpperCase();
+
+                if (lojaData.avatar) {
+                    document.getElementById('avatarImg').src = lojaData.avatar;
+                    document.getElementById('avatarImg').style.display = 'block';
+                }
+
+                if (lojaData.banner) {
+                    document.getElementById('bannerImg').src = lojaData.banner;
+                    document.getElementById('bannerImg').style.display = 'block';
+                }
+
+                if (lojaData.instagram) {
+                    document.getElementById('btnInstagram').href = lojaData.instagram;
+                    document.getElementById('btnInstagram').style.display = 'inline-flex';
+                }
+                if (lojaData.whatsapp) {
+                    document.getElementById('btnWhatsapp').href = 'https://wa.me/' + lojaData.whatsapp.replace(/\D/g, '');
+                    document.getElementById('btnWhatsapp').style.display = 'inline-flex';
+                }
+
+                document.getElementById('btnHome').href = `/${slug}`;
+                document.getElementById('btnHome').style.display = 'inline-flex';
+                document.getElementById('btnSearch').style.display = 'inline-flex';
+
+                renderizarCardapio(lojaData);
             } catch (erro) {
                 document.getElementById('cardapioContainer').innerHTML = `<div class="error">❌ Erro ao carregar cardápio: ${erro.message}</div>`;
             }
@@ -229,22 +390,33 @@
                 return;
             }
 
+            // Renderizar categorias
+            const categoriasHtml = cardapio.categorias.map((cat, idx) =>
+                `<div class="categoria-badge" onclick="filtrarCategoria('${cat.id}')" data-categoria="${cat.id}">${cat.nome}</div>`
+            ).join('');
+            document.getElementById('categoriasList').innerHTML = categoriasHtml;
+
+            // Renderizar produtos por categoria
             let html = '';
             cardapio.categorias.forEach(cat => {
                 const produtos = cardapio.produtos.filter(p => p.categoriaId === cat.id);
                 if (produtos.length === 0) return;
 
                 html += `
-                    <div class="categoria">
-                        <div class="categoria-titulo">${cat.nome}</div>
-                        ${cat.descricao ? `<div class="categoria-descricao">${cat.descricao}</div>` : ''}
+                    <div class="categoria-group" data-categoria="${cat.id}">
+                        <div class="categoria-titulo">${cat.nome.toUpperCase()}</div>
                         <div class="produtos-grid">
                             ${produtos.map(p => `
-                                <div class="produto ${p.disponivel === false ? 'indisponivel' : ''}">
-                                    <div class="produto-nome">${p.nome}</div>
-                                    ${p.descricao ? `<div class="produto-desc">${p.descricao}</div>` : ''}
-                                    <div class="produto-preco">R$ ${parseFloat(p.preco).toFixed(2)}</div>
-                                    ${p.disponivel === false ? '<div class="indisponivel-label">Indisponível</div>' : ''}
+                                <div class="produto">
+                                    ${p.imagem ? `<img src="${p.imagem}" class="produto-img" alt="${p.nome}">` : ''}
+                                    <div class="produto-info">
+                                        <div class="produto-nome">${p.nome}</div>
+                                        ${p.descricao ? `<div class="produto-desc">${p.descricao}</div>` : ''}
+                                        <div class="produto-footer">
+                                            <div class="produto-preco">R$ ${parseFloat(p.preco).toFixed(2)}</div>
+                                            <button class="produto-like" onclick="toggleLike(event)">❤️</button>
+                                        </div>
+                                    </div>
                                 </div>
                             `).join('')}
                         </div>
@@ -253,6 +425,29 @@
             });
 
             document.getElementById('cardapioContainer').innerHTML = html || '<div class="loading">Nenhum produto cadastrado</div>';
+        }
+
+        function filtrarCategoria(categoriaId) {
+            const grupos = document.querySelectorAll('.categoria-group');
+            const badges = document.querySelectorAll('.categoria-badge');
+
+            if (categoriaSelecionada === categoriaId) {
+                categoriaSelecionada = null;
+                grupos.forEach(g => g.style.display = 'block');
+                badges.forEach(b => b.classList.remove('inactive'));
+            } else {
+                categoriaSelecionada = categoriaId;
+                grupos.forEach(g => {
+                    g.style.display = g.dataset.categoria === categoriaId ? 'block' : 'none';
+                });
+                badges.forEach(b => {
+                    b.classList.toggle('inactive', b.dataset.categoria !== categoriaId);
+                });
+            }
+        }
+
+        function toggleLike(event) {
+            event.target.style.opacity = event.target.style.opacity === '0.5' ? '1' : '0.5';
         }
 
         setInterval(carregarCardapio, 10000);
