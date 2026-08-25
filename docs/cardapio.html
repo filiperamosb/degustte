@@ -520,6 +520,20 @@
             }
         }
 
+        function corrigirCaracteres(texto) {
+            if (!texto) return texto;
+            return texto
+                .replace(/v\?rias/gi, 'várias')
+                .replace(/op\?@s/gi, 'opções')
+                .replace(/a\?/gi, 'ã')
+                .replace(/e\?/gi, 'é')
+                .replace(/i\?/gi, 'í')
+                .replace(/o\?/gi, 'ó')
+                .replace(/u\?/gi, 'ú')
+                .replace(/@@/g, 'ç')
+                .replace(/\?/g, 'á');
+        }
+
         function renderizarCardapio(loja) {
             const cardapio = loja.cardapio || { categorias: [], produtos: [] };
 
@@ -530,7 +544,7 @@
 
             // Renderizar categorias
             const categoriasHtml = cardapio.categorias.map((cat, idx) =>
-                `<div class="categoria-badge" onclick="filtrarCategoria('${cat.id}')" data-categoria="${cat.id}">${cat.nome}</div>`
+                `<div class="categoria-badge" onclick="filtrarCategoria('${cat.id}')" data-categoria="${cat.id}">${corrigirCaracteres(cat.nome)}</div>`
             ).join('');
             document.getElementById('categoriasList').innerHTML = categoriasHtml;
 
@@ -542,14 +556,14 @@
 
                 html += `
                     <div class="categoria-group" data-categoria="${cat.id}">
-                        <div class="categoria-titulo">${cat.nome.toUpperCase()}</div>
+                        <div class="categoria-titulo">${corrigirCaracteres(cat.nome).toUpperCase()}</div>
                         <div class="produtos-grid">
                             ${produtos.map(p => `
                                 <div class="produto">
-                                    ${p.imagem ? `<img src="${p.imagem}" class="produto-img" alt="${p.nome}">` : ''}
+                                    ${p.imagem ? `<img src="${p.imagem}" class="produto-img" alt="${p.nome}" onerror="this.style.display='none'">` : ''}
                                     <div class="produto-info">
-                                        <div class="produto-nome">${p.nome}</div>
-                                        ${p.descricao ? `<div class="produto-desc">${p.descricao}</div>` : ''}
+                                        <div class="produto-nome">${corrigirCaracteres(p.nome)}</div>
+                                        ${p.descricao ? `<div class="produto-desc">${corrigirCaracteres(p.descricao)}</div>` : ''}
                                         <div class="produto-footer">
                                             <div class="produto-preco">R$ ${parseFloat(p.preco).toFixed(2)}</div>
                                             <button class="produto-like" onclick="toggleLike(event)">❤️</button>
