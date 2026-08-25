@@ -29,11 +29,10 @@ app.post('/api/create-preference', async (req, res) => {
       },
       external_reference: `degustte-${Date.now()}`,
       back_urls: {
-        success: 'http://localhost:8001/sucesso.html',
+        success: 'http://localhost:8001/sucesso.html?external_reference={external_reference}',
         failure: 'http://localhost:8001/erro.html',
         pending: 'http://localhost:8001/pendente.html'
       },
-      auto_return: 'approved',
       notification_url: `http://localhost:${PORT}/webhook`
     };
 
