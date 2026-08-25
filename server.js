@@ -312,8 +312,8 @@ app.get('/api/health', async (req, res) => {
 });
 
 // Rotas de loja - ORDEM IMPORTA!
-// /cardapio DEVE vir ANTES da rota genérica
-app.get(/\/cardapio\/?$/i, (req, res) => {
+// /{slug}/cardapio DEVE vir ANTES da rota genérica
+app.get(/\/[a-z0-9]+\/cardapio\/?$/i, (req, res) => {
   res.sendFile(path.join(__dirname, 'docs', 'cardapio.html'));
 });
 
