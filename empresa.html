@@ -32,12 +32,14 @@
                 let slug = sessionStorage.getItem('empresaSlug') || window.location.pathname.split('/').filter(p => p).pop();
                 if (!slug || slug.includes('.')) { mostrarErro('Empresa não encontrada'); return; }
                 sessionStorage.removeItem('empresaSlug');
-                const response = await fetch('/data/empresas.json');
+                const url = new URL('/data/empresas.json', window.location.origin).href;
+                const response = await fetch(url);
                 const data = await response.json();
                 const empresa = data.empresas.find(e => e.slug === slug);
                 if (!empresa) { mostrarErro('Empresa não encontrada'); return; }
                 renderizarEmpresa(empresa);
             } catch (erro) {
+                console.error(erro);
                 mostrarErro('Erro ao carregar cardápio');
             }
         }
