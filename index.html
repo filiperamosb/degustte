@@ -517,19 +517,20 @@
         }
 
         .feature-list li {
-            padding: 12px 0;
+            padding: 12px 0 12px 30px;
             color: #666;
-            display: flex;
-            align-items: flex-start;
             font-size: 16px;
             line-height: 1.6;
-            gap: 12px;
+            position: relative;
         }
 
-        .feature-list .emoji {
+        .feature-list li:before {
+            content: "•";
+            color: #E74C3C;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
             font-size: 20px;
-            flex-shrink: 0;
-            margin-top: 2px;
         }
 
         /* Blog Section */
@@ -869,11 +870,11 @@
             <p>Apresente seus produtos de forma moderna, envolvente e estratégica, tornando cada escolha mais simples e cada pedido uma oportunidade de vender mais.</p>
             <p>Dê aos seus clientes uma experiência completa desde o primeiro contato com o cardápio. Organize seus produtos de maneira atrativa, valorize seus pratos, facilite a navegação e tenha total liberdade para atualizar informações sempre que precisar.</p>
             <ul class="feature-list">
-                <li><span class="emoji">🎨</span>Apresentação moderna e atrativa para valorizar cada produto</li>
-                <li><span class="emoji">📱</span>Experiência rápida e intuitiva em qualquer dispositivo</li>
-                <li><span class="emoji">⚙️</span>Conteúdo fácil de gerenciar sem depender de terceiros</li>
-                <li><span class="emoji">📈</span>Mais destaque para seus produtos e oportunidades de venda</li>
-                <li><span class="emoji">📊</span>Atendimento mais eficiente com informações claras e organizadas</li>
+                <li>Apresentação moderna e atrativa para valorizar cada produto</li>
+                <li>Experiência rápida e intuitiva em qualquer dispositivo</li>
+                <li>Conteúdo fácil de gerenciar sem depender de terceiros</li>
+                <li>Mais destaque para seus produtos e oportunidades de venda</li>
+                <li>Atendimento mais eficiente com informações claras e organizadas</li>
             </ul>
             <a href="#" class="btn-primary" style="margin-top: 25px;">Saiba Mais</a>
         </div>
