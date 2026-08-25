@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro DeGustte - Passo 3</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px 0;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            color: #FF6B35;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .form-wrapper {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            font-size: 28px;
+            color: #1a1a1a;
+            margin-bottom: 10px;
+        }
+
+        .form-subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+
+        .progress {
+            background: #f0f0f0;
+            height: 8px;
+            border-radius: 4px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            background: #FF6B35;
+            height: 100%;
+            width: 100%;
+            transition: width 0.3s;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #1a1a1a;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 40px;
+        }
+
+        button {
+            flex: 1;
+            padding: 14px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-submit {
+            background: #FF6B35;
+            color: white;
+        }
+
+        .btn-submit:hover:not(:disabled) {
+            background: #E55A25;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 107, 53, 0.2);
+        }
+
+        .btn-voltar {
+            background: #f0f0f0;
+            color: #1a1a1a;
+        }
+
+        .btn-voltar:hover {
+            background: #e0e0e0;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #FF6B35;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .resumo {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #FF6B35;
+        }
+
+        .resumo-item {
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .resumo-label {
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .resumo-valor {
+            color: #666;
+        }
+
+        .preco {
+            font-size: 24px;
+            font-weight: 700;
+            color: #FF6B35;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .form-wrapper {
+                padding: 25px;
+            }
+
+            .buttons {
+                flex-direction: column;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">DeGustte</div>
+            <p class="subtitle">Passo 3: Pagamento</p>
+        </header>
+
+        <div class="form-wrapper">
+            <div class="progress">
+                <div class="progress-bar"></div>
+            </div>
+
+            <h1>Finalize seu Cadastro</h1>
+            <p class="form-subtitle">Pagamento do plano DeGustte (Passo 3 de 3)</p>
+
+            <div class="resumo">
+                <div class="resumo-item">
+                    <span class="resumo-label">Empresa:</span>
+                    <span class="resumo-valor" id="resumoEmpresa">-</span>
+                </div>
+                <div class="resumo-item">
+                    <span class="resumo-label">Email:</span>
+                    <span class="resumo-valor" id="resumoEmail">-</span>
+                </div>
+                <div class="resumo-item">
+                    <span class="resumo-label">Responsável:</span>
+                    <span class="resumo-valor" id="resumoResponsavel">-</span>
+                </div>
+            </div>
+
+            <div class="preco">R$ 29,90/mês</div>
+
+            <p style="text-align: center; margin-bottom: 30px; color: #666; font-size: 14px;">
+                Clique no botão abaixo para proceder com o pagamento
+            </p>
+
+            <form id="pagamentoForm">
+                <div class="buttons">
+                    <button type="button" class="btn-voltar" onclick="window.history.back()">Voltar</button>
+                    <button type="submit" class="btn-submit" id="submitBtn">Ir para Pagamento</button>
+                </div>
+            </form>
+
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+                <p>Redirecionando para pagamento...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('pagamentoForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const loading = document.getElementById('loading');
+
+        // Carregar resumo
+        window.addEventListener('load', () => {
+            const passo1Data = JSON.parse(localStorage.getItem('passo1Data') || '{}');
+            document.getElementById('resumoEmpresa').textContent = passo1Data.nomeEmpresa || '-';
+            document.getElementById('resumoEmail').textContent = passo1Data.emailResponsavel || '-';
+            document.getElementById('resumoResponsavel').textContent = passo1Data.nomeResponsavel || '-';
+        });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            submitBtn.style.display = 'none';
+            loading.style.display = 'block';
+
+            try {
+                const passo1Data = JSON.parse(localStorage.getItem('passo1Data') || '{}');
+
+                const response = await fetch(
+                    'http://localhost:3000/api/create-payment',
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            nomeEmpresa: passo1Data.nomeEmpresa,
+                            email: passo1Data.emailResponsavel,
+                            valor: 29.90
+                        })
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error('Erro ao criar link de pagamento');
+                }
+
+                const result = await response.json();
+
+                if (result.link) {
+                    window.location.href = result.link;
+                } else {
+                    throw new Error('Link não recebido');
+                }
+
+            } catch (erro) {
+                alert('Erro: ' + erro.message);
+                submitBtn.style.display = 'block';
+                loading.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

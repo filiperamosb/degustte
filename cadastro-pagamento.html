@@ -352,53 +352,20 @@
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            submitBtn.style.display = 'none';
-            loading.style.display = 'block';
-            errorMessage.style.display = 'none';
-
             try {
                 const formData = new FormData(form);
                 const dados = Object.fromEntries(formData);
 
-                const response = await fetch(
-                    'http://localhost:3000/api/create-payment-link',
-                    {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            nomeEmpresa: dados.nomeEmpresa,
-                            email: dados.emailResponsavel,
-                            telefone: dados.telefone,
-                            valor: 1.00,
-                            dados: dados
-                        })
-                    }
-                );
+                // Salvar dados do Passo 1
+                localStorage.setItem('passo1Data', JSON.stringify(dados));
 
-                if (!response.ok) {
-                    throw new Error('Erro ao criar link de pagamento');
-                }
-
-                const result = await response.json();
-
-                if (result.paymentLink) {
-                    // Salvar dados do formulário
-                    localStorage.setItem('empresaData', JSON.stringify(dados));
-
-                    // Redirecionar para link de pagamento Asaas
-                    window.location.href = result.paymentLink;
-                } else {
-                    throw new Error('Link de pagamento não recebido');
-                }
+                // Redirecionar para Passo 2
+                window.location.href = '/cadastro-passo2.html';
 
             } catch (erro) {
                 console.error('Erro:', erro);
                 errorMessage.style.display = 'block';
                 errorMessage.innerHTML = `❌ ${erro.message}`;
-                submitBtn.style.display = 'block';
-                loading.style.display = 'none';
             }
         });
     </script>
