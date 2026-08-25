@@ -265,6 +265,17 @@
                         <input type="number" id="prodDesconto" placeholder="Ex: 10" step="0.01" min="0" max="100">
                     </div>
                 </div>
+
+                <div style="background:#f5f5f5; padding:15px; border-radius:8px; margin-top:20px; margin-bottom:20px;">
+                    <h3 style="color:#667eea; margin-bottom:15px;">Itens Adicionais (opcional)</h3>
+                    <div style="display:grid; grid-template-columns:1fr 100px auto; gap:10px; margin-bottom:10px;">
+                        <input type="text" id="adicionNome" placeholder="Ex: Bacon" style="padding:8px; border:1px solid #ddd; border-radius:5px;">
+                        <input type="number" id="adicionPreco" placeholder="Valor" step="0.01" style="padding:8px; border:1px solid #ddd; border-radius:5px;">
+                        <button class="btn" onclick="adicionarItemAdicional()" style="background:#667eea; padding:8px 15px;">+ Add</button>
+                    </div>
+                    <div id="listaAdicionais" style="max-height:150px; overflow-y:auto;"></div>
+                </div>
+
                 <button class="btn" onclick="adicionarProduto()">+ Adicionar Produto</button>
             </div>
 
@@ -327,6 +338,7 @@
         let pagamentosLocais = [];
         let bannerBase64 = null;
         let avatarBase64 = null;
+        let adicionaisTempo = [];
 
         // Converter arquivo para base64
         function fileToBase64(file) {
@@ -625,6 +637,38 @@
             }
         }
 
+        function adicionarItemAdicional() {
+            const nome = document.getElementById('adicionNome').value;
+            const preco = document.getElementById('adicionPreco').value;
+
+            if (!nome || !preco) return showToast('Preencha nome e valor do adicional', true);
+
+            adicionaisTempo.push({ nome, preco: parseFloat(preco) });
+            document.getElementById('adicionNome').value = '';
+            document.getElementById('adicionPreco').value = '';
+            renderizarAdicionais();
+        }
+
+        function renderizarAdicionais() {
+            const lista = document.getElementById('listaAdicionais');
+            if (adicionaisTempo.length === 0) {
+                lista.innerHTML = '<p style="color:#999;">Nenhum adicional adicionado</p>';
+                return;
+            }
+
+            lista.innerHTML = adicionaisTempo.map((ad, idx) => `
+                <div style="background:white; padding:8px 12px; margin-bottom:5px; border-radius:5px; display:flex; justify-content:space-between; align-items:center;">
+                    <span>${ad.nome} <span style="color:#667eea;">+R$ ${ad.preco.toFixed(2)}</span></span>
+                    <button onclick="removerItemAdicional(${idx})" style="background:#e74c3c; color:white; border:none; padding:4px 8px; border-radius:3px; cursor:pointer; font-size:0.8em;">✕</button>
+                </div>
+            `).join('');
+        }
+
+        function removerItemAdicional(idx) {
+            adicionaisTempo.splice(idx, 1);
+            renderizarAdicionais();
+        }
+
         async function adicionarProduto() {
             const nome = document.getElementById('prodNome').value;
             const descricao = document.getElementById('prodDesc').value;
@@ -649,7 +693,7 @@
                 const response = await fetch(`${API_URL}/empresas/${slug}/produtos`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ nome, descricao, imagem, categoriaId, preco, desconto: desconto ? parseFloat(desconto) : null })
+                    body: JSON.stringify({ nome, descricao, imagem, categoriaId, preco, desconto: desconto ? parseFloat(desconto) : null, adicionais: adicionaisTempo })
                 });
                 if (response.ok) {
                     showToast('Produto adicionado!');
@@ -659,6 +703,8 @@
                     document.getElementById('prodCategoria').value = '';
                     document.getElementById('prodPreco').value = '';
                     document.getElementById('prodDesconto').value = '';
+                    adicionaisTempo = [];
+                    document.getElementById('listaAdicionais').innerHTML = '<p style="color:#999;">Nenhum adicional adicionado</p>';
                     carregarDados();
                 } else {
                     showToast('Erro ao adicionar produto', true);
