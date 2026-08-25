@@ -23,6 +23,27 @@ const pool = new Pool({
   password: process.env.DB_PASSWORD,
 });
 
+// Executar migrações ao iniciar
+(async () => {
+  try {
+    await pool.query(`
+      ALTER TABLE empresas
+      ADD COLUMN IF NOT EXISTS avatar TEXT,
+      ADD COLUMN IF NOT EXISTS banner TEXT,
+      ADD COLUMN IF NOT EXISTS bio TEXT,
+      ADD COLUMN IF NOT EXISTS horarios JSONB,
+      ADD COLUMN IF NOT EXISTS pagamentos JSONB,
+      ADD COLUMN IF NOT EXISTS localizacao VARCHAR(255),
+      ADD COLUMN IF NOT EXISTS whatsapp VARCHAR(20),
+      ADD COLUMN IF NOT EXISTS facebook VARCHAR(255),
+      ADD COLUMN IF NOT EXISTS instagram VARCHAR(255)
+    `);
+    console.log('✅ Colunas de perfil criadas (ou já existiam)');
+  } catch (erro) {
+    console.error('Erro ao executar migrações:', erro.message);
+  }
+})();
+
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
@@ -246,6 +267,29 @@ app.post('/api/admin/login', async (req, res) => {
     } else {
       res.status(401).json({ erro: 'Credenciais inválidas' });
     }
+  } catch (erro) {
+    res.status(500).json({ erro: erro.message });
+  }
+});
+
+app.post('/api/admin/migrate', async (req, res) => {
+  try {
+    const { admin_key } = req.body;
+    if (admin_key !== 'admin123') return res.status(401).json({ erro: 'Não autorizado' });
+
+    await pool.query(`
+      ALTER TABLE empresas
+      ADD COLUMN IF NOT EXISTS avatar TEXT,
+      ADD COLUMN IF NOT EXISTS banner TEXT,
+      ADD COLUMN IF NOT EXISTS bio TEXT,
+      ADD COLUMN IF NOT EXISTS horarios JSONB,
+      ADD COLUMN IF NOT EXISTS pagamentos JSONB,
+      ADD COLUMN IF NOT EXISTS localizacao VARCHAR(255),
+      ADD COLUMN IF NOT EXISTS whatsapp VARCHAR(20),
+      ADD COLUMN IF NOT EXISTS facebook VARCHAR(255),
+      ADD COLUMN IF NOT EXISTS instagram VARCHAR(255)
+    `);
+    res.json({ ok: true, message: 'Migrações executadas com sucesso' });
   } catch (erro) {
     res.status(500).json({ erro: erro.message });
   }
