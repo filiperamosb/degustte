@@ -1,3 +1,52 @@
 {
-  "empresas": []
+  "empresas": [
+    {
+      "id": "1724569496123",
+      "nomeEmpresa": "Restaurante Alameda 22",
+      "email": "joao@alameda.com",
+      "telefone": "(11) 98765-4321",
+      "cnpj": "12.345.678/0001-90",
+      "tipo": "restaurante",
+      "nomeResponsavel": "João Silva Santos",
+      "cpf": "123.456.789-10",
+      "dataNascimento": "1990-05-15",
+      "plano": "essencial",
+      "status": "autorizada",
+      "slug": "restaurantealameda22",
+      "url": "degustte.com.br/restaurantealameda22",
+      "dataCadastro": "2026-08-25T00:24:56.123Z",
+      "dataAutorizacao": "2026-08-25T00:31:00.000Z",
+      "dados": {
+        "nomeEmpresa": "Restaurante Alameda 22",
+        "email": "contato@alameda.com",
+        "telefone": "(11) 98765-4321",
+        "cnpj": "12.345.678/0001-90",
+        "tipo": "restaurante",
+        "nomeResponsavel": "João Silva Santos",
+        "cpf": "123.456.789-10",
+        "dataNascimento": "1990-05-15",
+        "telefoneResponsavel": "(11) 98765-4321",
+        "emailResponsavel": "joao@alameda.com"
+      },
+      "cardapio": {
+        "categorias": [
+          {
+            "id": "1787628344313",
+            "nome": "Pratos Principais",
+            "descricao": "Os melhores pratos quentes da nossa casa"
+          }
+        ],
+        "produtos": [
+          {
+            "id": "1787628500000",
+            "nome": "Moqueca de Peixe",
+            "categoriaId": "1787628344313",
+            "descricao": "Peixe fresco com camarão, cebola e azeite de dendê. Um clássico baiano!",
+            "preco": 42.50,
+            "disponivel": true
+          }
+        ]
+      }
+    }
+  ]
 }
