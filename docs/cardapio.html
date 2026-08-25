@@ -44,23 +44,26 @@
         /* Header */
         .header {
             background: white;
-            padding: 30px 20px 40px;
+            padding: 30px 20px;
             display: flex;
-            align-items: flex-start;
-            gap: 30px;
+            align-items: center;
+            gap: 20px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
             max-width: 900px;
             margin: 0 auto;
+            margin-top: -60px;
+            position: relative;
+            z-index: 10;
         }
 
         .avatar {
-            width: 140px;
-            height: 140px;
+            width: 120px;
+            height: 120px;
             border-radius: 50%;
             object-fit: cover;
             background: white;
+            border: 4px solid white;
             box-shadow: 0 5px 25px rgba(0,0,0,0.2);
-            margin-top: -80px;
             flex-shrink: 0;
         }
 
@@ -69,15 +72,29 @@
         }
 
         .nome-loja {
-            font-size: 1.3em;
+            font-size: 1.4em;
             font-weight: bold;
             color: #1a1a1a;
+            margin-bottom: 8px;
         }
 
         .social-links {
             display: flex;
-            gap: 10px;
-            margin-top: 8px;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .avaliar-link {
+            color: #e67e22;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9em;
+            cursor: pointer;
+        }
+
+        .avaliar-link:hover {
+            text-decoration: underline;
         }
 
         .social-btn {
@@ -100,6 +117,83 @@
             max-width: 900px;
             margin: 0 auto;
             padding: 0 20px;
+        }
+
+        /* Destaques */
+        .destaques-section {
+            background: white;
+            padding: 30px 20px;
+            margin-top: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .destaques-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .destaques-title {
+            font-weight: bold;
+            color: #27ae60;
+            font-size: 1.1em;
+        }
+
+        .ver-todos {
+            color: #999;
+            text-decoration: none;
+            font-size: 0.9em;
+        }
+
+        .destaques-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-scroll, minmax(150px, 1fr));
+            gap: 15px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .destaque-item {
+            min-width: 150px;
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .destaque-img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+
+        .destaque-label {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #27ae60;
+            color: white;
+            padding: 8px;
+            font-size: 0.75em;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .destaque-like {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: white;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2em;
         }
 
         /* Categorias */
@@ -323,11 +417,20 @@
                 <a href="#" class="social-btn instagram" id="btnInstagram" style="display:none;" target="_blank">📷</a>
                 <a href="#" class="social-btn whatsapp" id="btnWhatsapp" style="display:none;" target="_blank">💬</a>
                 <a href="#" class="social-btn" id="btnSearch" style="display:none;" onclick="return false">🔍</a>
+                <a href="#" class="avaliar-link" id="btnAvaliar">Avaliar ⭐</a>
             </div>
         </div>
     </div>
 
     <div class="container">
+        <div class="destaques-section" id="destaquesSection" style="display:none;">
+            <div class="destaques-header">
+                <div class="destaques-title">Destaques</div>
+                <a href="#" class="ver-todos">Ver todas →</a>
+            </div>
+            <div class="destaques-grid" id="destaquesList"></div>
+        </div>
+
         <div class="categorias-section">
             <div class="categorias-title">Categorias</div>
             <div class="categorias-list" id="categoriasList"></div>
@@ -381,8 +484,10 @@
                 document.getElementById('btnHome').href = `/${slug}`;
                 document.getElementById('btnHome').style.display = 'inline-flex';
                 document.getElementById('btnSearch').style.display = 'inline-flex';
+                document.getElementById('btnAvaliar').style.display = 'inline-block';
 
                 renderizarCardapio(lojaData);
+                renderizarDestaques(lojaData);
             } catch (erro) {
                 document.getElementById('cardapioContainer').innerHTML = `<div class="error">❌ Erro ao carregar cardápio: ${erro.message}</div>`;
             }
@@ -454,6 +559,27 @@
 
         function toggleLike(event) {
             event.target.style.opacity = event.target.style.opacity === '0.5' ? '1' : '0.5';
+        }
+
+        function renderizarDestaques(loja) {
+            const cardapio = loja.cardapio || { categorias: [], produtos: [] };
+            const destaques = cardapio.produtos.slice(0, 5);
+
+            if (destaques.length === 0) {
+                document.getElementById('destaquesSection').style.display = 'none';
+                return;
+            }
+
+            document.getElementById('destaquesSection').style.display = 'block';
+            const html = destaques.map(p => `
+                <div class="destaque-item">
+                    ${p.imagem ? `<img src="${p.imagem}" class="destaque-img" alt="${p.nome}">` : '<div class="destaque-img" style="background:#e0e0e0;"></div>'}
+                    <button class="destaque-like" onclick="toggleLike(event)">❤️</button>
+                    <div class="destaque-label">${p.nome.substring(0, 20)}</div>
+                </div>
+            `).join('');
+
+            document.getElementById('destaquesList').innerHTML = html;
         }
 
         setInterval(carregarCardapio, 10000);
