@@ -53,8 +53,11 @@ app.post('/api/create-preference', async (req, res) => {
       preferenceId: response.data.id
     });
   } catch (error) {
-    console.error('Erro ao criar preferência:', error.response?.data || error.message);
-    res.status(500).json({ error: error.message });
+    console.error('Erro ao criar preferência:', JSON.stringify(error.response?.data || error.message, null, 2));
+    res.status(500).json({
+      error: error.response?.data?.message || error.message,
+      details: error.response?.data
+    });
   }
 });
 
