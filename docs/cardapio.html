@@ -328,14 +328,13 @@
 
         .produto {
             display: flex;
-            flex-direction: column;
-            gap: 0;
-            padding: 0;
+            flex-direction: row;
+            gap: 15px;
+            padding: 12px;
             background: white;
-            border-radius: 8px;
+            border-radius: 6px;
             transition: all 0.3s;
-            align-items: stretch;
-            overflow: hidden;
+            align-items: flex-start;
             border: 1px solid #f0f0f0;
         }
 
@@ -347,8 +346,6 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            padding: 12px;
-            justify-content: space-between;
         }
 
         .produto-nome {
@@ -361,17 +358,16 @@
         .produto-desc {
             color: #888;
             font-size: 0.75em;
-            margin-bottom: 0;
+            margin-bottom: 6px;
             line-height: 1.3;
             flex: 1;
-            display: none;
         }
 
         .produto-footer {
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-start;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
 
         .produto-preco {
@@ -391,9 +387,9 @@
         .produto-img-container {
             position: relative;
             flex-shrink: 0;
-            width: 100%;
-            height: 140px;
-            border-radius: 0;
+            width: 160px;
+            height: 110px;
+            border-radius: 6px;
             overflow: hidden;
             background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
         }
