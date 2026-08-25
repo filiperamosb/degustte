@@ -1,6 +1,7 @@
 {
   "name": "deguste-app",
   "version": "1.0.0",
+  "type": "module",
   "description": "Plataforma de Gestão para Bares e Restaurantes",
   "main": "index.html",
   "scripts": {
