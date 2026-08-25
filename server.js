@@ -311,6 +311,11 @@ app.get('/api/health', async (req, res) => {
   }
 });
 
+// Rotas de loja
+app.get(/^\/(?!api|admin)[a-z0-9]+\/cardapio\/?$/i, (req, res) => {
+  res.sendFile(path.join(__dirname, 'docs', 'cardapio.html'));
+});
+
 // SPA fallback - rotas como /alameda22 servem a página de loja
 app.get(/^\/(?!api|admin).*/, (req, res) => {
   res.sendFile(path.join(__dirname, 'docs', 'loja.html'));

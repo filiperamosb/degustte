@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cardápio - DeGustte</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; color: #333; }
+
+        .back-link { display: inline-block; padding: 12px 20px; color: #27ae60; text-decoration: none; margin: 15px 0 0 15px; font-weight: 600; }
+        .back-link:hover { text-decoration: underline; }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: white;
+            padding: 30px 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 2em;
+            font-weight: bold;
+            color: #27ae60;
+            margin-bottom: 10px;
+        }
+
+        .nome-loja {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #1a1a1a;
+        }
+
+        .cardapio-section {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .categoria {
+            margin-bottom: 40px;
+        }
+
+        .categoria-titulo {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #1a1a1a;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #27ae60;
+        }
+
+        .categoria-descricao {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 0.95em;
+        }
+
+        .produtos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .produto {
+            background: #f9f9f9;
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s;
+        }
+
+        .produto:hover {
+            box-shadow: 0 5px 20px rgba(39, 174, 96, 0.2);
+            transform: translateY(-3px);
+        }
+
+        .produto-nome {
+            font-weight: bold;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+
+        .produto-desc {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+
+        .produto-preco {
+            color: #27ae60;
+            font-weight: bold;
+            font-size: 1.3em;
+        }
+
+        .produto.indisponivel {
+            opacity: 0.6;
+            background: #f0f0f0;
+        }
+
+        .indisponivel-label {
+            display: inline-block;
+            background: #999;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 0.75em;
+            margin-top: 8px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #27ae60;
+            font-size: 1.2em;
+        }
+
+        .error {
+            text-align: center;
+            padding: 40px;
+            color: #e74c3c;
+            font-size: 1.2em;
+        }
+
+        @media (max-width: 768px) {
+            .produtos-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .nome-loja {
+                font-size: 1.3em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="" class="back-link" id="backLink">← Voltar para loja</a>
+
+    <div class="container">
+        <div class="header">
+            <div class="logo">🍽️ DeGustte</div>
+            <div class="nome-loja" id="nomeLoja">Carregando...</div>
+        </div>
+
+        <div class="cardapio-section" id="cardapioContainer">
+            <div class="loading">Carregando cardápio...</div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://api.degustte.com.br/api';
+        let slug = null;
+
+        window.addEventListener('load', async () => {
+            slug = window.location.pathname.split('/')[1] || 'restaurantealameda22';
+            document.getElementById('backLink').href = `/${slug}`;
+            await carregarCardapio();
+        });
+
+        async function carregarCardapio() {
+            try {
+                const response = await fetch(`${API_URL}/empresas/${slug}`);
+                if (!response.ok) throw new Error('Loja não encontrada');
+
+                const loja = await response.json();
+                document.getElementById('nomeLoja').textContent = loja.nome_empresa;
+                renderizarCardapio(loja);
+            } catch (erro) {
+                document.getElementById('cardapioContainer').innerHTML = `<div class="error">❌ Erro ao carregar cardápio: ${erro.message}</div>`;
+            }
+        }
+
+        function renderizarCardapio(loja) {
+            const cardapio = loja.cardapio || { categorias: [], produtos: [] };
+
+            if (!cardapio.categorias || cardapio.categorias.length === 0) {
+                document.getElementById('cardapioContainer').innerHTML = '<div class="loading">Cardápio ainda não foi preenchido</div>';
+                return;
+            }
+
+            let html = '';
+            cardapio.categorias.forEach(cat => {
+                const produtos = cardapio.produtos.filter(p => p.categoriaId === cat.id);
+                if (produtos.length === 0) return;
+
+                html += `
+                    <div class="categoria">
+                        <div class="categoria-titulo">${cat.nome}</div>
+                        ${cat.descricao ? `<div class="categoria-descricao">${cat.descricao}</div>` : ''}
+                        <div class="produtos-grid">
+                            ${produtos.map(p => `
+                                <div class="produto ${p.disponivel === false ? 'indisponivel' : ''}">
+                                    <div class="produto-nome">${p.nome}</div>
+                                    ${p.descricao ? `<div class="produto-desc">${p.descricao}</div>` : ''}
+                                    <div class="produto-preco">R$ ${parseFloat(p.preco).toFixed(2)}</div>
+                                    ${p.disponivel === false ? '<div class="indisponivel-label">Indisponível</div>' : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+
+            document.getElementById('cardapioContainer').innerHTML = html || '<div class="loading">Nenhum produto cadastrado</div>';
+        }
+
+        setInterval(carregarCardapio, 10000);
+    </script>
+</body>
+</html>
