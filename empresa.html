@@ -29,8 +29,9 @@
     <script>
         async function carregarEmpresa() {
             try {
-                const slug = window.location.pathname.split('/').filter(p => p).pop();
+                let slug = sessionStorage.getItem('empresaSlug') || window.location.pathname.split('/').filter(p => p).pop();
                 if (!slug || slug.includes('.')) { mostrarErro('Empresa não encontrada'); return; }
+                sessionStorage.removeItem('empresaSlug');
                 const response = await fetch('/data/empresas.json');
                 const data = await response.json();
                 const empresa = data.empresas.find(e => e.slug === slug);
