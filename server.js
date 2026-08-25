@@ -176,12 +176,12 @@ app.post('/api/empresas/:slug/categorias', async (req, res) => {
 app.post('/api/empresas/:slug/produtos', async (req, res) => {
   try {
     const { slug } = req.params;
-    const { nome, categoriaId, descricao, preco, disponivel } = req.body;
+    const { nome, categoriaId, descricao, preco, disponivel, imagem } = req.body;
     const empresaResult = await pool.query('SELECT * FROM empresas WHERE slug = $1', [slug]);
     if (empresaResult.rows.length === 0) return res.status(404).json({ erro: 'Empresa não encontrada' });
     const empresa = empresaResult.rows[0];
     const cardapio = empresa.cardapio || { categorias: [], produtos: [] };
-    const produto = { id: Date.now().toString(), nome, categoriaId, descricao, preco: parseFloat(preco), disponivel: disponivel !== false };
+    const produto = { id: Date.now().toString(), nome, categoriaId, descricao, preco: parseFloat(preco), disponivel: disponivel !== false, imagem };
     cardapio.produtos.push(produto);
     await pool.query('UPDATE empresas SET cardapio = $1 WHERE slug = $2', [JSON.stringify(cardapio), slug]);
     res.json(produto);
@@ -193,7 +193,7 @@ app.post('/api/empresas/:slug/produtos', async (req, res) => {
 app.patch('/api/empresas/:slug/produtos/:produtoId', async (req, res) => {
   try {
     const { slug, produtoId } = req.params;
-    const { nome, categoriaId, descricao, preco, disponivel } = req.body;
+    const { nome, categoriaId, descricao, preco, disponivel, imagem } = req.body;
     const empresaResult = await pool.query('SELECT * FROM empresas WHERE slug = $1', [slug]);
     if (empresaResult.rows.length === 0) return res.status(404).json({ erro: 'Empresa não encontrada' });
     const empresa = empresaResult.rows[0];
@@ -206,6 +206,7 @@ app.patch('/api/empresas/:slug/produtos/:produtoId', async (req, res) => {
     if (descricao !== undefined) produto.descricao = descricao;
     if (preco !== undefined) produto.preco = parseFloat(preco);
     if (disponivel !== undefined) produto.disponivel = disponivel;
+    if (imagem !== undefined) produto.imagem = imagem;
 
     await pool.query('UPDATE empresas SET cardapio = $1 WHERE slug = $2', [JSON.stringify(cardapio), slug]);
     res.json(produto);
