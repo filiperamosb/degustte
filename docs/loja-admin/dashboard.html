@@ -271,6 +271,45 @@
         </div>
     </div>
 
+    <!-- Modal de Edição de Produto -->
+    <div id="editModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000;">
+        <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:white; padding:30px; border-radius:10px; width:90%; max-width:600px; max-height:90vh; overflow-y:auto;">
+            <h2 style="color:#667eea; margin-bottom:20px;">Editar Produto</h2>
+
+            <div class="form-group">
+                <label>Nome</label>
+                <input type="text" id="editProdNome" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:5px;">
+            </div>
+
+            <div class="form-group">
+                <label>Descrição</label>
+                <textarea id="editProdDesc" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:5px; min-height:70px;"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Imagem</label>
+                <input type="file" id="editProdImagem" accept="image/*">
+                <img id="editProdImagemPreview" style="max-width:100%; max-height:200px; margin-top:10px; border-radius:5px;">
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+                <div class="form-group">
+                    <label>Categoria</label>
+                    <select id="editProdCategoria" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:5px;"></select>
+                </div>
+                <div class="form-group">
+                    <label>Preço</label>
+                    <input type="number" id="editProdPreco" step="0.01" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:5px;">
+                </div>
+            </div>
+
+            <div style="display:flex; gap:10px; margin-top:20px;">
+                <button class="btn" onclick="salvarEdicaoProduto()" style="flex:1;">Salvar</button>
+                <button class="btn" onclick="fecharEditModal()" style="flex:1; background:#999;">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
     <div class="toast" id="toast"></div>
 
     <script>
@@ -510,6 +549,7 @@
                         <p>${prod.descricao || '-'} | R$ ${parseFloat(prod.preco).toFixed(2)}</p>
                         <p style="color:#999; font-size:0.9em;">Categoria: ${categoria?.nome || 'N/A'}</p>
                         <div style="margin-top:8px; display:flex; gap:6px;">
+                            <button class="btn" onclick="abrirEditModal('${prod.id}')" style="background:#667eea; color:white; font-size:0.85em; flex:1;">✏️ Editar</button>
                             <button class="btn btn-outline" onclick="alternarDisponibilidade('${prod.id}', ${prod.disponivel === false})" style="background:white; border:1px solid #667eea; color:#667eea; font-size:0.85em;">
                                 ${prod.disponivel === false ? 'Ativar' : 'Pausar'}
                             </button>
@@ -627,6 +667,78 @@
                     carregarDados();
                 } else {
                     showToast('Erro ao excluir', true);
+                }
+            } catch (error) {
+                showToast('Erro: ' + error.message, true);
+            }
+        }
+
+        let produtoEditandoId = null;
+
+        function abrirEditModal(produtoId) {
+            produtoEditandoId = produtoId;
+            const produto = cardapioCache.produtos.find(p => p.id === produtoId);
+            if (!produto) return;
+
+            document.getElementById('editProdNome').value = produto.nome;
+            document.getElementById('editProdDesc').value = produto.descricao || '';
+            document.getElementById('editProdPreco').value = produto.preco;
+            document.getElementById('editProdCategoria').value = produto.categoriaId;
+
+            if (produto.imagem) {
+                document.getElementById('editProdImagemPreview').src = produto.imagem;
+                document.getElementById('editProdImagemPreview').style.display = 'block';
+            } else {
+                document.getElementById('editProdImagemPreview').style.display = 'none';
+            }
+
+            // Popular categorias
+            const selectCateg = document.getElementById('editProdCategoria');
+            selectCateg.innerHTML = cardapioCache.categorias.map(c =>
+                `<option value="${c.id}" ${c.id === produto.categoriaId ? 'selected' : ''}>${c.nome}</option>`
+            ).join('');
+
+            document.getElementById('editModal').style.display = 'block';
+        }
+
+        function fecharEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+            produtoEditandoId = null;
+        }
+
+        async function salvarEdicaoProduto() {
+            const nome = document.getElementById('editProdNome').value;
+            const descricao = document.getElementById('editProdDesc').value;
+            const categoriaId = document.getElementById('editProdCategoria').value;
+            const preco = document.getElementById('editProdPreco').value;
+            const imagemFile = document.getElementById('editProdImagem').files[0];
+
+            if (!nome || !categoriaId || !preco) return showToast('Preencha todos os campos obrigatórios', true);
+
+            const produtoAtual = cardapioCache.produtos.find(p => p.id === produtoEditandoId);
+            let imagem = produtoAtual.imagem;
+
+            if (imagemFile) {
+                const reader = new FileReader();
+                imagem = await new Promise((resolve, reject) => {
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(imagemFile);
+                });
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/empresas/${slug}/produtos/${produtoEditandoId}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nome, descricao, imagem, categoriaId, preco })
+                });
+                if (response.ok) {
+                    showToast('Produto atualizado!');
+                    fecharEditModal();
+                    carregarDados();
+                } else {
+                    showToast('Erro ao atualizar produto', true);
                 }
             } catch (error) {
                 showToast('Erro: ' + error.message, true);
