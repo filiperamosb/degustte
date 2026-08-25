@@ -260,6 +260,10 @@
                         <label>Preço</label>
                         <input type="number" id="prodPreco" placeholder="Ex: 5.50" step="0.01">
                     </div>
+                    <div class="form-group">
+                        <label>Desconto (%) <span style="color:#999;">(opcional)</span></label>
+                        <input type="number" id="prodDesconto" placeholder="Ex: 10" step="0.01" min="0" max="100">
+                    </div>
                 </div>
                 <button class="btn" onclick="adicionarProduto()">+ Adicionar Produto</button>
             </div>
@@ -292,7 +296,7 @@
                 <img id="editProdImagemPreview" style="max-width:100%; max-height:200px; margin-top:10px; border-radius:5px;">
             </div>
 
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:15px;">
                 <div class="form-group">
                     <label>Categoria</label>
                     <select id="editProdCategoria" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:5px;"></select>
@@ -300,6 +304,10 @@
                 <div class="form-group">
                     <label>Preço</label>
                     <input type="number" id="editProdPreco" step="0.01" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:5px;">
+                </div>
+                <div class="form-group">
+                    <label>Desconto (%)</label>
+                    <input type="number" id="editProdDesconto" step="0.01" min="0" max="100" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:5px;">
                 </div>
             </div>
 
@@ -541,13 +549,27 @@
                 return;
             }
 
-            lista.innerHTML = cardapioCache.produtos.map(prod => {
-                const categoria = cardapioCache.categorias.find(c => c.id === prod.categoriaId);
-                return `
+            // Agrupar produtos por categoria
+            const produtosPorCategoria = {};
+            cardapioCache.categorias.forEach(cat => {
+                produtosPorCategoria[cat.id] = {
+                    nome: cat.nome,
+                    produtos: cardapioCache.produtos.filter(p => p.categoriaId === cat.id)
+                };
+            });
+
+            let html = '';
+            Object.entries(produtosPorCategoria).forEach(([catId, {nome, produtos}]) => {
+                if (produtos.length === 0) return;
+
+                html += `<div style="margin-bottom:30px;">
+                    <h3 style="color:#667eea; margin-bottom:15px; font-size:1.1em; border-bottom:2px solid #667eea; padding-bottom:10px;">${nome}</h3>`;
+
+                html += produtos.map(prod => `
                     <div style="background:#f0f0f0; padding:12px; border-radius:5px; margin-bottom:10px; border-left:3px solid #667eea;">
                         <strong>${prod.nome}</strong>
-                        <p>${prod.descricao || '-'} | R$ ${parseFloat(prod.preco).toFixed(2)}</p>
-                        <p style="color:#999; font-size:0.9em;">Categoria: ${categoria?.nome || 'N/A'}</p>
+                        <p>${prod.descricao || '-'} | R$ ${parseFloat(prod.preco).toFixed(2)}
+                        ${prod.desconto ? ` <span style="color:#e74c3c;">-${prod.desconto}%</span>` : ''}</p>
                         <div style="margin-top:8px; display:flex; gap:6px;">
                             <button class="btn" onclick="abrirEditModal('${prod.id}')" style="background:#667eea; color:white; font-size:0.85em; flex:1;">✏️ Editar</button>
                             <button class="btn btn-outline" onclick="alternarDisponibilidade('${prod.id}', ${prod.disponivel === false})" style="background:white; border:1px solid #667eea; color:#667eea; font-size:0.85em;">
@@ -556,8 +578,12 @@
                             <button class="btn btn-danger" onclick="excluirProduto('${prod.id}')">Excluir</button>
                         </div>
                     </div>
-                `;
-            }).join('');
+                `).join('');
+
+                html += '</div>';
+            });
+
+            lista.innerHTML = html;
         }
 
         async function adicionarCategoria() {
@@ -604,6 +630,7 @@
             const descricao = document.getElementById('prodDesc').value;
             const categoriaId = document.getElementById('prodCategoria').value;
             const preco = document.getElementById('prodPreco').value;
+            const desconto = document.getElementById('prodDesconto').value;
             const imagemFile = document.getElementById('prodImagem').files[0];
 
             if (!nome || !categoriaId || !preco) return showToast('Preencha todos os campos obrigatórios', true);
@@ -622,7 +649,7 @@
                 const response = await fetch(`${API_URL}/empresas/${slug}/produtos`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ nome, descricao, imagem, categoriaId, preco })
+                    body: JSON.stringify({ nome, descricao, imagem, categoriaId, preco, desconto: desconto ? parseFloat(desconto) : null })
                 });
                 if (response.ok) {
                     showToast('Produto adicionado!');
@@ -631,6 +658,7 @@
                     document.getElementById('prodImagem').value = '';
                     document.getElementById('prodCategoria').value = '';
                     document.getElementById('prodPreco').value = '';
+                    document.getElementById('prodDesconto').value = '';
                     carregarDados();
                 } else {
                     showToast('Erro ao adicionar produto', true);
@@ -683,6 +711,7 @@
             document.getElementById('editProdNome').value = produto.nome;
             document.getElementById('editProdDesc').value = produto.descricao || '';
             document.getElementById('editProdPreco').value = produto.preco;
+            document.getElementById('editProdDesconto').value = produto.desconto || '';
             document.getElementById('editProdCategoria').value = produto.categoriaId;
 
             if (produto.imagem) {
@@ -711,6 +740,7 @@
             const descricao = document.getElementById('editProdDesc').value;
             const categoriaId = document.getElementById('editProdCategoria').value;
             const preco = document.getElementById('editProdPreco').value;
+            const desconto = document.getElementById('editProdDesconto').value;
             const imagemFile = document.getElementById('editProdImagem').files[0];
 
             if (!nome || !categoriaId || !preco) return showToast('Preencha todos os campos obrigatórios', true);
@@ -731,7 +761,7 @@
                 const response = await fetch(`${API_URL}/empresas/${slug}/produtos/${produtoEditandoId}`, {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ nome, descricao, imagem, categoriaId, preco })
+                    body: JSON.stringify({ nome, descricao, imagem, categoriaId, preco, desconto: desconto ? parseFloat(desconto) : null })
                 });
                 if (response.ok) {
                     showToast('Produto atualizado!');
