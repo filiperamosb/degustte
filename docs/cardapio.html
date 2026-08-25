@@ -147,24 +147,27 @@
         }
 
         .destaques-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-scroll, minmax(150px, 1fr));
-            gap: 15px;
+            display: flex;
+            gap: 12px;
             overflow-x: auto;
             padding-bottom: 10px;
+            scroll-behavior: smooth;
         }
 
         .destaque-item {
-            min-width: 150px;
+            min-width: 140px;
+            max-width: 140px;
             position: relative;
             border-radius: 8px;
             overflow: hidden;
+            flex-shrink: 0;
         }
 
         .destaque-img {
-            width: 100%;
-            height: 150px;
+            width: 140px;
+            height: 120px;
             object-fit: cover;
+            display: block;
         }
 
         .destaque-label {
