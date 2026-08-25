@@ -301,6 +301,21 @@
             }
         }
 
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeInUp 0.8s ease-out;
+        }
+
         .restaurant-logos {
             display: flex;
             justify-content: center;
@@ -846,16 +861,18 @@
     </section>
 
     <!-- Feature: Digital Menu -->
-    <section class="feature-section feature-1">
+    <section class="feature-section feature-1 fade-in">
         <div class="feature-content">
             <h2>Cardápio Digital</h2>
-            <p>Transforme seu cardápio em uma experiência com inteligência, design e estratégia</p>
-            <p>Encante clientes, aumente o ticket médio e modernize seu atendimento com um cardápio digital inteligente.</p>
+            <p><strong>Mais do que um menu: uma nova forma de apresentar o seu restaurante</strong></p>
+            <p>Apresente seus produtos de forma moderna, envolvente e estratégica, tornando cada escolha mais simples e cada pedido uma oportunidade de vender mais.</p>
+            <p>Dê aos seus clientes uma experiência completa desde o primeiro contato com o cardápio. Organize seus produtos de maneira atrativa, valorize seus pratos, facilite a navegação e tenha total liberdade para atualizar informações sempre que precisar.</p>
             <ul class="feature-list">
-                <li>Fotos e vídeos que despertam desejo</li>
-                <li>Multilíngue para atender qualquer cliente</li>
-                <li>Atualização simples e instantânea</li>
-                <li>Feedbacks e avaliações dos clientes</li>
+                <li>Apresentação moderna e atrativa para valorizar cada produto</li>
+                <li>Experiência rápida e intuitiva em qualquer dispositivo</li>
+                <li>Conteúdo fácil de gerenciar sem depender de terceiros</li>
+                <li>Mais destaque para seus produtos e oportunidades de venda</li>
+                <li>Atendimento mais eficiente com informações claras e organizadas</li>
             </ul>
             <a href="#" class="btn-primary" style="margin-top: 25px;">Saiba Mais</a>
         </div>
