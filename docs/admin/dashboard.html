@@ -301,6 +301,19 @@
                     <div style="margin-top:6px; color:#667eea; font-size:0.85em;" id="previewLink"></div>
                 </div>
 
+                <h3 style="color:#667eea; margin:20px 0 10px 0; border-top:1px solid #eee; padding-top:15px;">Acesso do Dono (Painel do Restaurante)</h3>
+
+                <div class="two-columns">
+                    <div class="form-group">
+                        <label>Email de acesso</label>
+                        <input type="email" id="revLojaEmail" placeholder="dono@restaurante.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Senha de acesso</label>
+                        <input type="text" id="revLojaSenha" placeholder="Deixe em branco para não alterar">
+                    </div>
+                </div>
+
                 <div class="modal-actions">
                     <button type="button" class="btn btn-outline" onclick="fecharModal()">Cancelar</button>
                     <button type="button" class="btn" onclick="salvarEdicao()">Salvar Alterações</button>
@@ -396,6 +409,7 @@
                     <a class="link-personalizado" href="https://www.degustte.com.br/${emp.slug}" target="_blank">
                         degustte.com.br/${emp.slug}
                     </a>
+                    <div class="empresa-info">🔐 Acesso do dono: ${emp.loja_email ? emp.loja_email : '<span style="color:#f39c12">ainda não configurado</span>'}</div>
                     <div class="empresa-actions">
                         <button class="btn" onclick="abrirRevisao(${emp.id})">✏️ Editar / Cardápio</button>
                     </div>
@@ -414,6 +428,8 @@
             document.getElementById('revCnpj').value = emp.cnpj;
             document.getElementById('revPlano').value = emp.plano;
             document.getElementById('revSlug').value = emp.slug;
+            document.getElementById('revLojaEmail').value = emp.loja_email || '';
+            document.getElementById('revLojaSenha').value = '';
             atualizarPreviewLink();
 
             document.getElementById('modalRevisao').classList.add('open');
@@ -437,7 +453,9 @@
                 telefone: document.getElementById('revTelefone').value,
                 cnpj: document.getElementById('revCnpj').value,
                 plano: document.getElementById('revPlano').value,
-                slug: document.getElementById('revSlug').value
+                slug: document.getElementById('revSlug').value,
+                loja_email: document.getElementById('revLojaEmail').value,
+                loja_senha: document.getElementById('revLojaSenha').value
             };
 
             try {

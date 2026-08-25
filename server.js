@@ -5,6 +5,7 @@ import pg from 'pg';
 import path from 'path';
 import https from 'https';
 import fs from 'fs';
+import bcrypt from 'bcryptjs';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -24,7 +25,7 @@ const pool = new Pool({
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static('public'));
+app.use(express.static('docs'));
 
 // EMPRESAS
 app.post('/api/empresas', async (req, res) => {
@@ -48,7 +49,8 @@ app.post('/api/empresas', async (req, res) => {
 app.get('/api/empresas', async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM empresas ORDER BY data_criacao DESC');
-    res.json(result.rows);
+    const empresas = result.rows.map(({ loja_senha, ...resto }) => resto);
+    res.json(empresas);
   } catch (erro) {
     res.status(500).json({ erro: erro.message });
   }
@@ -59,7 +61,8 @@ app.get('/api/empresas/:slug', async (req, res) => {
     const { slug } = req.params;
     const result = await pool.query('SELECT * FROM empresas WHERE slug = $1 AND status != $2', [slug, 'bloqueada']);
     if (result.rows.length === 0) return res.status(404).json({ erro: 'Empresa não encontrada' });
-    res.json(result.rows[0]);
+    const { loja_senha, ...empresa } = result.rows[0];
+    res.json(empresa);
   } catch (erro) {
     res.status(500).json({ erro: erro.message });
   }
@@ -68,13 +71,25 @@ app.get('/api/empresas/:slug', async (req, res) => {
 app.patch('/api/empresas/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const { nome_empresa, email, telefone, cnpj, plano, slug } = req.body;
-    const result = await pool.query(
-      'UPDATE empresas SET nome_empresa = $1, email = $2, telefone = $3, cnpj = $4, plano = $5, slug = $6 WHERE id = $7 RETURNING *',
-      [nome_empresa, email, telefone, cnpj, plano, slug, id]
-    );
+    const { nome_empresa, email, telefone, cnpj, plano, slug, loja_email, loja_senha } = req.body;
+
+    let result;
+    if (loja_senha) {
+      const senhaHash = await bcrypt.hash(loja_senha, 10);
+      result = await pool.query(
+        'UPDATE empresas SET nome_empresa = $1, email = $2, telefone = $3, cnpj = $4, plano = $5, slug = $6, loja_email = $7, loja_senha = $8 WHERE id = $9 RETURNING *',
+        [nome_empresa, email, telefone, cnpj, plano, slug, loja_email, senhaHash, id]
+      );
+    } else {
+      result = await pool.query(
+        'UPDATE empresas SET nome_empresa = $1, email = $2, telefone = $3, cnpj = $4, plano = $5, slug = $6, loja_email = $7 WHERE id = $8 RETURNING *',
+        [nome_empresa, email, telefone, cnpj, plano, slug, loja_email, id]
+      );
+    }
+
     if (result.rows.length === 0) return res.status(404).json({ erro: 'Empresa não encontrada' });
-    res.json({ ok: true, empresa: result.rows[0] });
+    const { loja_senha: _omit, ...empresaSemSenha } = result.rows[0];
+    res.json({ ok: true, empresa: empresaSemSenha });
   } catch (erro) {
     console.error(erro);
     res.status(400).json({ erro: erro.message });
@@ -127,6 +142,80 @@ app.post('/api/empresas/:slug/produtos', async (req, res) => {
   }
 });
 
+app.patch('/api/empresas/:slug/produtos/:produtoId', async (req, res) => {
+  try {
+    const { slug, produtoId } = req.params;
+    const { nome, categoriaId, descricao, preco, disponivel } = req.body;
+    const empresaResult = await pool.query('SELECT * FROM empresas WHERE slug = $1', [slug]);
+    if (empresaResult.rows.length === 0) return res.status(404).json({ erro: 'Empresa não encontrada' });
+    const empresa = empresaResult.rows[0];
+    const cardapio = empresa.cardapio || { categorias: [], produtos: [] };
+    const produto = cardapio.produtos.find(p => p.id === produtoId);
+    if (!produto) return res.status(404).json({ erro: 'Produto não encontrado' });
+
+    if (nome !== undefined) produto.nome = nome;
+    if (categoriaId !== undefined) produto.categoriaId = categoriaId;
+    if (descricao !== undefined) produto.descricao = descricao;
+    if (preco !== undefined) produto.preco = parseFloat(preco);
+    if (disponivel !== undefined) produto.disponivel = disponivel;
+
+    await pool.query('UPDATE empresas SET cardapio = $1 WHERE slug = $2', [JSON.stringify(cardapio), slug]);
+    res.json(produto);
+  } catch (erro) {
+    res.status(500).json({ erro: erro.message });
+  }
+});
+
+app.delete('/api/empresas/:slug/produtos/:produtoId', async (req, res) => {
+  try {
+    const { slug, produtoId } = req.params;
+    const empresaResult = await pool.query('SELECT * FROM empresas WHERE slug = $1', [slug]);
+    if (empresaResult.rows.length === 0) return res.status(404).json({ erro: 'Empresa não encontrada' });
+    const empresa = empresaResult.rows[0];
+    const cardapio = empresa.cardapio || { categorias: [], produtos: [] };
+    cardapio.produtos = cardapio.produtos.filter(p => p.id !== produtoId);
+    await pool.query('UPDATE empresas SET cardapio = $1 WHERE slug = $2', [JSON.stringify(cardapio), slug]);
+    res.json({ ok: true });
+  } catch (erro) {
+    res.status(500).json({ erro: erro.message });
+  }
+});
+
+app.delete('/api/empresas/:slug/categorias/:categoriaId', async (req, res) => {
+  try {
+    const { slug, categoriaId } = req.params;
+    const empresaResult = await pool.query('SELECT * FROM empresas WHERE slug = $1', [slug]);
+    if (empresaResult.rows.length === 0) return res.status(404).json({ erro: 'Empresa não encontrada' });
+    const empresa = empresaResult.rows[0];
+    const cardapio = empresa.cardapio || { categorias: [], produtos: [] };
+    cardapio.categorias = cardapio.categorias.filter(c => c.id !== categoriaId);
+    cardapio.produtos = cardapio.produtos.filter(p => p.categoriaId !== categoriaId);
+    await pool.query('UPDATE empresas SET cardapio = $1 WHERE slug = $2', [JSON.stringify(cardapio), slug]);
+    res.json({ ok: true });
+  } catch (erro) {
+    res.status(500).json({ erro: erro.message });
+  }
+});
+
+// LOGIN DO DONO DA LOJA
+app.post('/api/loja/login', async (req, res) => {
+  try {
+    const { email, senha } = req.body;
+    const result = await pool.query('SELECT * FROM empresas WHERE loja_email = $1', [email]);
+    if (result.rows.length === 0) return res.status(401).json({ erro: 'Email ou senha incorretos' });
+
+    const empresa = result.rows[0];
+    if (!empresa.loja_senha) return res.status(401).json({ erro: 'Acesso ainda não liberado pelo administrador' });
+
+    const senhaValida = await bcrypt.compare(senha, empresa.loja_senha);
+    if (!senhaValida) return res.status(401).json({ erro: 'Email ou senha incorretos' });
+
+    res.json({ ok: true, empresa: { slug: empresa.slug, nome_empresa: empresa.nome_empresa, email: empresa.loja_email } });
+  } catch (erro) {
+    res.status(500).json({ erro: erro.message });
+  }
+});
+
 // ADMIN
 app.post('/api/admin/login', async (req, res) => {
   try {
@@ -153,7 +242,7 @@ app.get('/api/health', async (req, res) => {
 
 // SPA fallback - rotas como /alameda22 servem a página de loja
 app.get(/^\/(?!api|admin).*/, (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'loja.html'));
+  res.sendFile(path.join(__dirname, 'docs', 'loja.html'));
 });
 
 // 404

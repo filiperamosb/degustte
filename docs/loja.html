@@ -135,6 +135,10 @@
         <button class="atualizar" onclick="carregarCardapio()">🔄 Atualizar</button>
 
         <div id="cardapio"></div>
+
+        <footer style="text-align:center; margin-top:40px; padding:20px;">
+            <a id="linkDono" href="/loja-admin/login.html" class="back-link">🔧 É o dono deste restaurante? Acesse o painel</a>
+        </footer>
     </div>
 
     <script>
@@ -167,6 +171,8 @@
                     </div>
                 `;
                 headerDiv.classList.remove('loading');
+
+                document.getElementById('linkDono').href = `/loja-admin/login.html?slug=${slug}`;
 
                 // Carregar cardápio
                 const cardapio = empresa.cardapio || { categorias: [], produtos: [] };
