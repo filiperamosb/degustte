@@ -43,21 +43,21 @@
         /* Header */
         .header {
             background: white;
-            padding: 20px;
+            padding: 30px 20px 40px;
             display: flex;
-            align-items: center;
-            gap: 20px;
+            align-items: flex-start;
+            gap: 30px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
 
         .avatar {
-            width: 100px;
-            height: 100px;
+            width: 140px;
+            height: 140px;
             border-radius: 50%;
             object-fit: cover;
             background: white;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            margin-top: -50px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+            margin-top: -80px;
             flex-shrink: 0;
         }
 
@@ -260,10 +260,13 @@
             .header {
                 flex-direction: column;
                 text-align: center;
+                align-items: center;
             }
 
             .avatar {
-                margin-top: -40px;
+                width: 100px;
+                height: 100px;
+                margin-top: -60px;
             }
 
             .categorias-list {
