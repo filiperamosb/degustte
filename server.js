@@ -1,21 +1,19 @@
 import express from 'express';
-import axios from 'axios';
+import stripe from 'stripe';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
 const app = express();
-
 app.use(express.json());
 
-// CORS Middleware - BEFORE all routes
+// CORS Middleware
 app.use((req, res, next) => {
   res.set('Access-Control-Allow-Origin', '*');
   res.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH');
   res.set('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
   res.set('Access-Control-Max-Age', '86400');
 
-  // Handle preflight
   if (req.method === 'OPTIONS') {
     return res.sendStatus(204);
   }
@@ -24,116 +22,78 @@ app.use((req, res, next) => {
 });
 
 const PORT = process.env.PORT || 3000;
-const ACCESS_TOKEN = process.env.MERCADOPAGO_ACCESS_TOKEN;
+const stripeClient = stripe(process.env.STRIPE_SECRET_KEY);
 
-app.post('/api/create-preference', async (req, res) => {
+// Criar sessão de pagamento Stripe
+app.post('/api/create-checkout-session', async (req, res) => {
   try {
-    const { nomeEmpresa, email, valor, dados } = req.body;
+    const { nomeEmpresa, email, telefone, valor, dados } = req.body;
 
-    const preference = {
-      items: [
+    const session = await stripeClient.checkout.sessions.create({
+      payment_method_types: ['card', 'boleto', 'pix'],
+      line_items: [
         {
-          title: `Plano DeGustte - ${nomeEmpresa}`,
-          quantity: 1,
-          unit_price: valor
+          price_data: {
+            currency: 'brl',
+            product_data: {
+              name: `Plano DeGustte - ${nomeEmpresa}`,
+              description: `Empresa: ${nomeEmpresa}\nEmail: ${email}\nTelefone: ${telefone}`
+            },
+            unit_amount: Math.round(valor * 100)
+          },
+          quantity: 1
         }
       ],
-      payer: {
-        email: email
+      metadata: {
+        nomeEmpresa,
+        email,
+        telefone,
+        dados: JSON.stringify(dados)
       },
-      external_reference: `degustte-${Date.now()}`,
-      back_urls: {
-        success: 'https://www.degustte.com.br/redirect.html',
-        failure: 'https://www.degustte.com.br/erro.html',
-        pending: 'https://www.degustte.com.br/pendente.html'
-      },
-      notification_url: 'https://deguuste.onrender.com/webhook'
-    };
+      mode: 'payment',
+      success_url: 'http://localhost:8001/sucesso.html',
+      cancel_url: 'http://localhost:8001/erro.html'
+    });
 
-    const response = await axios.post(
-      'https://api.mercadopago.com/checkout/preferences',
-      preference,
-      {
-        headers: {
-          Authorization: `Bearer ${ACCESS_TOKEN}`,
-          'Content-Type': 'application/json'
-        }
-      }
-    );
-
-    console.log('Preferência criada:', response.data.id);
+    console.log('Sessão Stripe criada:', session.id);
 
     res.json({
-      initPoint: response.data.init_point,
-      preferenceId: response.data.id
+      sessionId: session.id,
+      publishableKey: process.env.STRIPE_PUBLISHABLE_KEY
     });
   } catch (error) {
-    console.error('Erro ao criar preferência:', JSON.stringify(error.response?.data || error.message, null, 2));
+    console.error('Erro ao criar sessão:', error.message);
     res.status(500).json({
-      error: error.response?.data?.message || error.message,
-      details: error.response?.data
+      error: error.message
     });
   }
 });
 
-const approvedPayments = new Set();
-
-app.post('/webhook', (req, res) => {
-  console.log('Webhook recebido:', req.body);
-
-  if (req.body.type === 'payment' && req.body.action === 'payment.created') {
-    const reference = req.body.data?.id;
-    if (reference) {
-      approvedPayments.add(reference);
-      console.log('Pagamento aprovado:', reference);
-    }
-  }
-
-  res.json({ status: 'received' });
-});
-
-app.get('/api/check-payment', async (req, res) => {
-  const reference = req.query.reference;
-  console.log('Verificando pagamento:', reference);
+// Webhook para confirmação de pagamento
+app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
+  const sig = req.headers['stripe-signature'];
 
   try {
-    const response = await axios.get(
-      'https://api.mercadopago.com/v1/payments/search?sort=date_created&criteria=desc&limit=100',
-      {
-        headers: {
-          Authorization: `Bearer ${ACCESS_TOKEN}`
-        }
-      }
+    const event = stripeClient.webhooks.constructEvent(
+      req.body,
+      sig,
+      process.env.STRIPE_WEBHOOK_SECRET || 'whsec_test'
     );
 
-    const payments = response.data.results || [];
-    const payment = payments.find(p =>
-      p.description && p.description.includes(reference) && p.status === 'approved'
-    );
-
-    if (payment) {
-      console.log('✅ Pagamento encontrado e aprovado:', payment.id);
-      res.json({
-        approved: true,
-        paymentId: payment.id,
-        amount: payment.transaction_amount
-      });
-    } else {
-      res.json({
-        approved: false,
-        message: 'Aguardando confirmação...'
-      });
+    if (event.type === 'checkout.session.completed') {
+      const session = event.data.object;
+      console.log('✅ Pagamento confirmado:', session.id);
+      console.log('Metadados:', session.metadata);
     }
+
+    res.json({ received: true });
   } catch (error) {
-    console.error('Erro ao verificar pagamento:', error.message);
-    res.json({
-      approved: false,
-      message: 'Erro ao verificar'
-    });
+    console.error('Erro no webhook:', error.message);
+    res.status(400).send(`Webhook Error: ${error.message}`);
   }
 });
 
 app.listen(PORT, () => {
   console.log(`🚀 Servidor rodando na porta ${PORT}`);
-  console.log(`API disponível em /api/create-preference`);
+  console.log(`API disponível em /api/create-checkout-session`);
 });

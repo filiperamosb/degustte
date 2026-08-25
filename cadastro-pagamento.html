@@ -338,16 +338,18 @@
 
             <div id="loading" class="loading">
                 <div class="spinner"></div>
-                <p>Processando seu cadastro...</p>
+                <p>Redirecionando para pagamento...</p>
             </div>
         </div>
     </div>
 
+    <script src="https://js.stripe.com/v3/"></script>
     <script>
         const form = document.getElementById('empresaForm');
         const submitBtn = document.getElementById('submitBtn');
         const loading = document.getElementById('loading');
         const errorMessage = document.getElementById('errorMessage');
+        const stripe = Stripe('pk_test_51ThWnZDUZBwcZBvOGewalxFsZpzQoy0EksvvgSzd2hhHkU2S0YKeWu0GL7D9HhPyQRlezAIxKJwHOo9WTZrPlvn800xqxwwLXt');
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -360,9 +362,8 @@
                 const formData = new FormData(form);
                 const dados = Object.fromEntries(formData);
 
-                // Enviar para o backend
                 const response = await fetch(
-                    'http://localhost:3000/api/create-preference',
+                    'http://localhost:3000/api/create-checkout-session',
                     {
                         method: 'POST',
                         headers: {
@@ -371,6 +372,7 @@
                         body: JSON.stringify({
                             nomeEmpresa: dados.nomeEmpresa,
                             email: dados.emailResponsavel,
+                            telefone: dados.telefone,
                             valor: 1.00,
                             dados: dados
                         })
@@ -378,50 +380,23 @@
                 );
 
                 if (!response.ok) {
-                    throw new Error('Erro ao criar preferência de pagamento');
+                    throw new Error('Erro ao criar sessão de pagamento');
                 }
 
                 const result = await response.json();
 
-                if (result.initPoint) {
-                    // Abrir MercadoPago em nova aba
-                    window.open(result.initPoint, '_blank');
+                if (result.sessionId) {
+                    localStorage.setItem('empresaData', JSON.stringify(dados));
 
-                    // Salvar referência para polling
-                    localStorage.setItem('paymentReference', dados.nomeEmpresa);
+                    const { error } = await stripe.redirectToCheckout({
+                        sessionId: result.sessionId
+                    });
 
-                    // Mostrar mensagem de espera
-                    errorMessage.style.display = 'block';
-                    errorMessage.innerHTML = '⏳ Janela de pagamento aberta. Aguardando confirmação...';
-                    errorMessage.style.backgroundColor = '#d4edda';
-                    errorMessage.style.borderColor = '#c3e6cb';
-                    errorMessage.style.color = '#155724';
-
-                    // Fazer polling para verificar pagamento
-                    let pollCount = 0;
-                    const pollInterval = setInterval(async () => {
-                        pollCount++;
-                        try {
-                            const checkResponse = await fetch(
-                                'http://localhost:3000/api/check-payment?reference=' + encodeURIComponent(dados.nomeEmpresa)
-                            );
-                            const checkResult = await checkResponse.json();
-
-                            if (checkResult.approved) {
-                                clearInterval(pollInterval);
-                                window.location.href = '/sucesso.html';
-                            }
-                        } catch (e) {
-                            console.log('Polling...', pollCount);
-                        }
-
-                        // Parar polling após 15 minutos
-                        if (pollCount > 450) {
-                            clearInterval(pollInterval);
-                        }
-                    }, 2000);
+                    if (error) {
+                        throw new Error(error.message);
+                    }
                 } else {
-                    throw new Error('Link de pagamento não recebido');
+                    throw new Error('ID da sessão não recebido');
                 }
 
             } catch (erro) {
