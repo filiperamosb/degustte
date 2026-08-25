@@ -48,8 +48,12 @@ app.post('/api/create-preference', async (req, res) => {
     );
 
     console.log('Preferência criada:', response.data.id);
+
+    // Adicionar script de redirecionamento automático à URL
+    const initPointWithRedirect = response.data.init_point + '?auto_return=approved';
+
     res.json({
-      initPoint: response.data.init_point,
+      initPoint: initPointWithRedirect,
       preferenceId: response.data.id
     });
   } catch (error) {
