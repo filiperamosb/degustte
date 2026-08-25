@@ -610,8 +610,8 @@
 
                 document.getElementById('btnHome').href = `/${slug}`;
                 document.getElementById('btnHome').style.display = 'inline-flex';
-                document.getElementById('btnSearch').style.display = 'inline-flex';
-                document.getElementById('btnAvaliar').style.display = 'inline-block';
+                const btnAvaliar = document.getElementById('btnAvaliar');
+                if (btnAvaliar) btnAvaliar.style.display = 'inline-block';
 
                 renderizarCardapio(lojaData);
                 renderizarDestaques(lojaData);
