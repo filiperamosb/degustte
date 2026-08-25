@@ -1,5 +1,4 @@
 import express from 'express';
-import cors from 'cors';
 import axios from 'axios';
 import dotenv from 'dotenv';
 
@@ -9,15 +8,16 @@ const app = express();
 
 app.use(express.json());
 
+// CORS Middleware - BEFORE all routes
 app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH');
-  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-  res.setHeader('Access-Control-Max-Age', '3600');
+  res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH');
+  res.set('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  res.set('Access-Control-Max-Age', '86400');
 
+  // Handle preflight
   if (req.method === 'OPTIONS') {
-    res.sendStatus(204);
-    return;
+    return res.sendStatus(204);
   }
 
   next();
@@ -27,14 +27,6 @@ const PORT = process.env.PORT || 3000;
 const ACCESS_TOKEN = process.env.MERCADOPAGO_ACCESS_TOKEN;
 
 app.post('/api/create-preference', async (req, res) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type');
-
-  if (req.method === 'OPTIONS') {
-    return res.sendStatus(200);
-  }
-
   try {
     const { nomeEmpresa, email, valor, dados } = req.body;
 
@@ -101,14 +93,6 @@ app.post('/webhook', (req, res) => {
 });
 
 app.get('/api/check-payment', async (req, res) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type');
-
-  if (req.method === 'OPTIONS') {
-    return res.sendStatus(200);
-  }
-
   const reference = req.query.reference;
   console.log('Verificando pagamento:', reference);
 
