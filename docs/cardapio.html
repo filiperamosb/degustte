@@ -115,9 +115,29 @@
             border: 1px solid #27ae60;
             color: #27ae60;
             transition: all 0.3s;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            font-size: 0;
         }
 
-        .social-btn:hover { background: #27ae60; color: white; }
+        .social-btn:not(#btnFacebook):not(#btnInstagram) {
+            font-size: 14px;
+        }
+
+        #btnFacebook {
+            background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/2023_Facebook_icon.svg/960px-2023_Facebook_icon.svg.png');
+            background-size: 70%;
+            border: none;
+        }
+
+        #btnInstagram {
+            background-image: url('https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png');
+            background-size: 70%;
+            border: none;
+        }
+
+        .social-btn:hover { background-color: #27ae60; }
 
         .avaliar-link {
             color: #e67e22;
@@ -496,8 +516,8 @@
             <div class="nome-loja" id="nomeLoja">Carregando...</div>
             <div class="social-links">
                 <a href="#" class="social-btn" id="btnHome" style="display:none;" target="_blank">🏠</a>
-                <a href="#" class="social-btn" id="btnFacebook" style="display:none;" target="_blank">f</a>
-                <a href="#" class="social-btn instagram" id="btnInstagram" style="display:none;" target="_blank">📷</a>
+                <a href="#" class="social-btn" id="btnFacebook" style="display:none;" target="_blank"></a>
+                <a href="#" class="social-btn" id="btnInstagram" style="display:none;" target="_blank"></a>
                 <a href="#" class="social-btn whatsapp" id="btnWhatsapp" style="display:none;" target="_blank">💬</a>
                 <a href="#" class="social-btn" id="btnPhone" style="display:none;" onclick="return false">☎️</a>
                 <a href="#" class="avaliar-link" id="btnAvaliar">Avaliar ⭐</a>
@@ -567,7 +587,10 @@
                 }
 
                 if (lojaData.banner) {
-                    document.querySelector('.banner-section').style.backgroundImage = `url('${lojaData.banner}')`;
+                    const bannerEl = document.querySelector('.banner-section');
+                    if (bannerEl) {
+                        bannerEl.style.backgroundImage = `url('${lojaData.banner}')`;
+                    }
                 }
 
                 if (lojaData.facebook) {
