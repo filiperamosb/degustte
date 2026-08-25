@@ -84,16 +84,47 @@ app.post('/webhook', (req, res) => {
 });
 
 // Endpoint para verificar status do pagamento
-app.get('/api/check-payment', (req, res) => {
+app.get('/api/check-payment', async (req, res) => {
   const reference = req.query.reference;
   console.log('Verificando pagamento:', reference);
 
-  // Aqui você poderia consultar a API do MercadoPago
-  // Por enquanto, vamos retornar um placeholder
-  res.json({
-    approved: false,
-    message: 'Aguardando confirmação do MercadoPago'
-  });
+  try {
+    // Consultar API do MercadoPago para buscar pagamentos recentes
+    const response = await axios.get(
+      'https://api.mercadopago.com/v1/payments/search?sort=date_created&criteria=desc&limit=100',
+      {
+        headers: {
+          Authorization: `Bearer ${ACCESS_TOKEN}`
+        }
+      }
+    );
+
+    // Procurar por pagamento com a descrição que enviamos
+    const payments = response.data.results || [];
+    const payment = payments.find(p =>
+      p.description && p.description.includes(reference) && p.status === 'approved'
+    );
+
+    if (payment) {
+      console.log('✅ Pagamento encontrado e aprovado:', payment.id);
+      res.json({
+        approved: true,
+        paymentId: payment.id,
+        amount: payment.transaction_amount
+      });
+    } else {
+      res.json({
+        approved: false,
+        message: 'Aguardando confirmação...'
+      });
+    }
+  } catch (error) {
+    console.error('Erro ao verificar pagamento:', error.message);
+    res.json({
+      approved: false,
+      message: 'Erro ao verificar'
+    });
+  }
 });
 
 app.get('/sucesso', (req, res) => {
