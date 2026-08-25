@@ -1,7 +1,13 @@
-# Node modules
+﻿# Dependencies
 node_modules/
-npm-debug.log
-yarn-error.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+.env
+.env.local
+.env.*.local
 
 # IDE
 .vscode/
@@ -9,15 +15,11 @@ yarn-error.log
 *.swp
 *.swo
 *~
+.DS_Store
 
 # OS
-.DS_Store
 Thumbs.db
-
-# Environment
-.env
-.env.local
-.env.*.local
+desktop.ini
 
 # Build
 dist/
@@ -26,3 +28,21 @@ build/
 # Logs
 logs/
 *.log
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Database backups
+*.sql
+
+# Docker
+.dockerignore
+
+# PM2
+ecosystem.config.js
+
+# Node
+package-lock.json
+yarn.lock
