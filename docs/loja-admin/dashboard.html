@@ -322,6 +322,16 @@
                 </div>
             </div>
 
+            <div style="background:#f5f5f5; padding:15px; border-radius:8px; margin-top:20px;">
+                <h3 style="color:#667eea; margin-bottom:15px;">Itens Adicionais</h3>
+                <div style="display:grid; grid-template-columns:1fr 100px auto; gap:10px; margin-bottom:10px;">
+                    <input type="text" id="editAdicionNome" placeholder="Ex: Bacon" style="padding:8px; border:1px solid #ddd; border-radius:5px;">
+                    <input type="number" id="editAdicionPreco" placeholder="Valor" step="0.01" style="padding:8px; border:1px solid #ddd; border-radius:5px;">
+                    <button class="btn" onclick="adicionarAdicionaiEdit()" style="background:#667eea; padding:8px 15px;">+ Add</button>
+                </div>
+                <div id="editAdicionaisList" style="max-height:150px; overflow-y:auto;"></div>
+            </div>
+
             <div style="display:flex; gap:10px; margin-top:20px;">
                 <button class="btn" onclick="salvarEdicaoProduto()" style="flex:1;">Salvar</button>
                 <button class="btn" onclick="fecharEditModal()" style="flex:1; background:#999;">Cancelar</button>
@@ -748,6 +758,7 @@
         }
 
         let produtoEditandoId = null;
+        let adicionaisEdit = [];
 
         function abrirEditModal(produtoId) {
             produtoEditandoId = produtoId;
@@ -773,12 +784,48 @@
                 `<option value="${c.id}" ${c.id === produto.categoriaId ? 'selected' : ''}>${c.nome}</option>`
             ).join('');
 
+            // Carregar adicionais
+            adicionaisEdit = JSON.parse(JSON.stringify(produto.adicionais || []));
+            renderizarAdicionaisEdit();
+
             document.getElementById('editModal').style.display = 'block';
         }
 
         function fecharEditModal() {
             document.getElementById('editModal').style.display = 'none';
             produtoEditandoId = null;
+        }
+
+        function renderizarAdicionaisEdit() {
+            const lista = document.getElementById('editAdicionaisList');
+            if (adicionaisEdit.length === 0) {
+                lista.innerHTML = '<p style="color:#999;">Nenhum adicional adicionado</p>';
+                return;
+            }
+
+            lista.innerHTML = adicionaisEdit.map((ad, idx) => `
+                <div style="background:white; padding:8px 12px; margin-bottom:5px; border-radius:5px; display:flex; justify-content:space-between; align-items:center;">
+                    <span>${ad.nome} <span style="color:#667eea;">+R$ ${ad.preco.toFixed(2)}</span></span>
+                    <button onclick="removerAdicionaiEdit(${idx})" style="background:#e74c3c; color:white; border:none; padding:4px 8px; border-radius:3px; cursor:pointer; font-size:0.8em;">✕</button>
+                </div>
+            `).join('');
+        }
+
+        function adicionarAdicionaiEdit() {
+            const nome = document.getElementById('editAdicionNome').value;
+            const preco = document.getElementById('editAdicionPreco').value;
+
+            if (!nome || !preco) return showToast('Preencha nome e valor do adicional', true);
+
+            adicionaisEdit.push({ nome, preco: parseFloat(preco) });
+            document.getElementById('editAdicionNome').value = '';
+            document.getElementById('editAdicionPreco').value = '';
+            renderizarAdicionaisEdit();
+        }
+
+        function removerAdicionaiEdit(idx) {
+            adicionaisEdit.splice(idx, 1);
+            renderizarAdicionaisEdit();
         }
 
         async function salvarEdicaoProduto() {
@@ -807,7 +854,7 @@
                 const response = await fetch(`${API_URL}/empresas/${slug}/produtos/${produtoEditandoId}`, {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ nome, descricao, imagem, categoriaId, preco, desconto: desconto ? parseFloat(desconto) : null })
+                    body: JSON.stringify({ nome, descricao, imagem, categoriaId, preco, desconto: desconto ? parseFloat(desconto) : null, adicionais: adicionaisEdit })
                 });
                 if (response.ok) {
                     showToast('Produto atualizado!');
