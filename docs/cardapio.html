@@ -598,14 +598,17 @@
                         <div class="produtos-grid">
                             ${produtos.map(p => `
                                 <div class="produto">
-                                    ${p.imagem ? `<img src="${p.imagem}" class="produto-img" alt="${p.nome}" onerror="this.style.display='none'">` : ''}
                                     <div class="produto-info">
                                         <div class="produto-nome">${corrigirCaracteres(p.nome)}</div>
                                         ${p.descricao ? `<div class="produto-desc">${corrigirCaracteres(p.descricao)}</div>` : ''}
                                         <div class="produto-footer">
                                             <div class="produto-preco">R$ ${parseFloat(p.preco).toFixed(2)}</div>
-                                            <button class="produto-like" onclick="toggleLike(event)">❤️</button>
+                                            <div class="produto-like-count"><span>0</span> ❤️</div>
                                         </div>
+                                    </div>
+                                    <div class="produto-img-container">
+                                        ${p.imagem ? `<img src="${p.imagem}" class="produto-img" alt="${p.nome}" onerror="this.style.display='none'">` : ''}
+                                        <button class="produto-img-like" onclick="toggleLike(event)">❤️</button>
                                     </div>
                                 </div>
                             `).join('')}
