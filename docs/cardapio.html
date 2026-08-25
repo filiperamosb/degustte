@@ -297,11 +297,12 @@
 
         .produto {
             display: flex;
-            gap: 15px;
-            padding: 15px;
+            gap: 20px;
+            padding: 20px;
             background: #f9f9f9;
             border-radius: 8px;
             transition: all 0.3s;
+            align-items: flex-start;
         }
 
         .produto:hover {
@@ -309,13 +310,43 @@
             transform: translateY(-2px);
         }
 
-        .produto-img {
-            width: 100px;
+        .produto-img-container {
+            position: relative;
+            flex-shrink: 0;
+            width: 120px;
             height: 100px;
             border-radius: 8px;
+            overflow: hidden;
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+        }
+
+        .produto-img {
+            width: 100%;
+            height: 100%;
             object-fit: cover;
-            flex-shrink: 0;
-            background: #e0e0e0;
+            display: block;
+        }
+
+        .produto-img-like {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: white;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .produto-img-like:hover {
+            transform: scale(1.1);
         }
 
         .produto-info {
@@ -326,38 +357,35 @@
             font-weight: bold;
             color: #1a1a1a;
             margin-bottom: 5px;
+            font-size: 1.05em;
         }
 
         .produto-desc {
             color: #666;
             font-size: 0.85em;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
             line-height: 1.4;
         }
 
         .produto-footer {
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-start;
             align-items: center;
-            margin-top: 8px;
+            gap: 20px;
         }
 
         .produto-preco {
             color: #27ae60;
             font-weight: bold;
-            font-size: 0.95em;
+            font-size: 1em;
         }
 
-        .produto-like {
-            background: none;
-            border: none;
-            font-size: 1.2em;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .produto-like:hover {
-            transform: scale(1.2);
+        .produto-like-count {
+            color: #e74c3c;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
 
         .loading {
