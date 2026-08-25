@@ -524,6 +524,22 @@
                 if (lojaData.avatar) {
                     document.getElementById('avatarImg').src = lojaData.avatar;
                     document.getElementById('avatarImg').style.display = 'block';
+                } else {
+                    // Avatar padrão com iniciais
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 200;
+                    canvas.height = 200;
+                    const ctx = canvas.getContext('2d');
+                    ctx.fillStyle = '#27ae60';
+                    ctx.fillRect(0, 0, 200, 200);
+                    ctx.fillStyle = 'white';
+                    ctx.font = 'bold 80px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    const inicial = lojaData.nome_empresa.charAt(0).toUpperCase();
+                    ctx.fillText(inicial, 100, 100);
+                    document.getElementById('avatarImg').src = canvas.toDataURL();
+                    document.getElementById('avatarImg').style.display = 'block';
                 }
 
                 if (lojaData.banner) {
