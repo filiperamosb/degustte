@@ -2,7 +2,6 @@
 import cors from 'cors';
 import dotenv from 'dotenv';
 import pg from 'pg';
-import crypto from 'crypto';
 
 dotenv.config();
 
@@ -29,10 +28,8 @@ app.post('/api/empresas', async (req, res) => {
     const slug = nomeEmpresa.toLowerCase().replace(/\s+/g, '').replace(/[^a-z0-9]/g, '').substring(0, 20);
 
     const result = await pool.query(
-      INSERT INTO empresas (slug, nome_empresa, email, telefone, cnpj, tipo, nome_responsavel, cpf, data_nascimento, email_responsavel, telefone_responsavel, plano, status, cardapio)
-       VALUES (\, \, \, \, \, \, \, \, \, \, \, \, 'pendente_revisao', '{"categorias":[],"produtos":[]}')
-       RETURNING *,
-      [slug, nomeEmpresa, email, telefone, cnpj, tipo, nomeResponsavel, cpf, dataNascimento, emailResponsavel, telefoneResponsavel, plano]
+      'INSERT INTO empresas (slug, nome_empresa, email, telefone, cnpj, tipo, nome_responsavel, cpf, data_nascimento, email_responsavel, telefone_responsavel, plano, status, cardapio) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING *',
+      [slug, nomeEmpresa, email, telefone, cnpj, tipo, nomeResponsavel, cpf, dataNascimento, emailResponsavel, telefoneResponsavel, plano, 'pendente_revisao', JSON.stringify({ categorias: [], produtos: [] })]
     );
 
     res.json({ ok: true, empresa: result.rows[0] });
@@ -54,7 +51,7 @@ app.get('/api/empresas', async (req, res) => {
 app.get('/api/empresas/:slug', async (req, res) => {
   try {
     const { slug } = req.params;
-    const result = await pool.query('SELECT * FROM empresas WHERE slug = \ AND status != \', [slug, 'bloqueada']);
+    const result = await pool.query('SELECT * FROM empresas WHERE slug = $1 AND status != $2', [slug, 'bloqueada']);
     if (result.rows.length === 0) return res.status(404).json({ erro: 'Empresa não encontrada' });
     res.json(result.rows[0]);
   } catch (erro) {
@@ -65,7 +62,7 @@ app.get('/api/empresas/:slug', async (req, res) => {
 app.patch('/api/empresas/:id/autorizar', async (req, res) => {
   try {
     const { id } = req.params;
-    const result = await pool.query('UPDATE empresas SET status = 'autorizada', data_autorizacao = NOW() WHERE id = \ RETURNING *', [id]);
+    const result = await pool.query('UPDATE empresas SET status = $1, data_autorizacao = NOW() WHERE id = $2 RETURNING *', ['autorizada', id]);
     if (result.rows.length === 0) return res.status(404).json({ erro: 'Empresa não encontrada' });
     res.json(result.rows[0]);
   } catch (erro) {
@@ -78,13 +75,13 @@ app.post('/api/empresas/:slug/categorias', async (req, res) => {
   try {
     const { slug } = req.params;
     const { nome, descricao } = req.body;
-    const empresaResult = await pool.query('SELECT * FROM empresas WHERE slug = \', [slug]);
+    const empresaResult = await pool.query('SELECT * FROM empresas WHERE slug = $1', [slug]);
     if (empresaResult.rows.length === 0) return res.status(404).json({ erro: 'Empresa não encontrada' });
     const empresa = empresaResult.rows[0];
     const cardapio = empresa.cardapio || { categorias: [], produtos: [] };
     const categoria = { id: Date.now().toString(), nome, descricao };
     cardapio.categorias.push(categoria);
-    await pool.query('UPDATE empresas SET cardapio = \ WHERE slug = \', [JSON.stringify(cardapio), slug]);
+    await pool.query('UPDATE empresas SET cardapio = $1 WHERE slug = $2', [JSON.stringify(cardapio), slug]);
     res.json(categoria);
   } catch (erro) {
     res.status(500).json({ erro: erro.message });
@@ -95,13 +92,13 @@ app.post('/api/empresas/:slug/produtos', async (req, res) => {
   try {
     const { slug } = req.params;
     const { nome, categoriaId, descricao, preco, disponivel } = req.body;
-    const empresaResult = await pool.query('SELECT * FROM empresas WHERE slug = \', [slug]);
+    const empresaResult = await pool.query('SELECT * FROM empresas WHERE slug = $1', [slug]);
     if (empresaResult.rows.length === 0) return res.status(404).json({ erro: 'Empresa não encontrada' });
     const empresa = empresaResult.rows[0];
     const cardapio = empresa.cardapio || { categorias: [], produtos: [] };
     const produto = { id: Date.now().toString(), nome, categoriaId, descricao, preco: parseFloat(preco), disponivel: disponivel !== false };
     cardapio.produtos.push(produto);
-    await pool.query('UPDATE empresas SET cardapio = \ WHERE slug = \', [JSON.stringify(cardapio), slug]);
+    await pool.query('UPDATE empresas SET cardapio = $1 WHERE slug = $2', [JSON.stringify(cardapio), slug]);
     res.json(produto);
   } catch (erro) {
     res.status(500).json({ erro: erro.message });
@@ -142,7 +139,7 @@ app.use((req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(\✅ DeGustte rodando em http://localhost:\\);
-  console.log(\📊 API: http://localhost:\/api\);
-  console.log(\🛡️  Admin: http://localhost:\/admin/login.html\);
+  console.log(`✅ DeGustte rodando em http://localhost:${PORT}`);
+  console.log(`📊 API: http://localhost:${PORT}/api`);
+  console.log(`🛡️  Admin: http://localhost:${PORT}/admin/login.html`);
 });
