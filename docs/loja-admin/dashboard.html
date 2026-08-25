@@ -246,8 +246,8 @@
                     <textarea id="prodDesc" placeholder="Ex: 500ml"></textarea>
                 </div>
                 <div class="form-group">
-                    <label>URL da Imagem</label>
-                    <input type="text" id="prodImagem" placeholder="https://exemplo.com/imagem.jpg">
+                    <label>Imagem do Produto</label>
+                    <input type="file" id="prodImagem" accept="image/*">
                 </div>
                 <div class="three-columns">
                     <div class="form-group">
@@ -562,11 +562,21 @@
         async function adicionarProduto() {
             const nome = document.getElementById('prodNome').value;
             const descricao = document.getElementById('prodDesc').value;
-            const imagem = document.getElementById('prodImagem').value;
             const categoriaId = document.getElementById('prodCategoria').value;
             const preco = document.getElementById('prodPreco').value;
+            const imagemFile = document.getElementById('prodImagem').files[0];
 
             if (!nome || !categoriaId || !preco) return showToast('Preencha todos os campos obrigatórios', true);
+
+            let imagem = null;
+            if (imagemFile) {
+                const reader = new FileReader();
+                imagem = await new Promise((resolve, reject) => {
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(imagemFile);
+                });
+            }
 
             try {
                 const response = await fetch(`${API_URL}/empresas/${slug}/produtos`, {
