@@ -384,7 +384,42 @@
                 const result = await response.json();
 
                 if (result.initPoint) {
-                    window.location.href = result.initPoint;
+                    // Abrir MercadoPago em nova aba
+                    window.open(result.initPoint, '_blank');
+
+                    // Salvar referência para polling
+                    localStorage.setItem('paymentReference', dados.nomeEmpresa);
+
+                    // Mostrar mensagem de espera
+                    errorMessage.style.display = 'block';
+                    errorMessage.innerHTML = '⏳ Janela de pagamento aberta. Aguardando confirmação...';
+                    errorMessage.style.backgroundColor = '#d4edda';
+                    errorMessage.style.borderColor = '#c3e6cb';
+                    errorMessage.style.color = '#155724';
+
+                    // Fazer polling para verificar pagamento
+                    let pollCount = 0;
+                    const pollInterval = setInterval(async () => {
+                        pollCount++;
+                        try {
+                            const checkResponse = await fetch(
+                                'http://localhost:3000/api/check-payment?reference=' + encodeURIComponent(dados.nomeEmpresa)
+                            );
+                            const checkResult = await checkResponse.json();
+
+                            if (checkResult.approved) {
+                                clearInterval(pollInterval);
+                                window.location.href = '/sucesso.html';
+                            }
+                        } catch (e) {
+                            console.log('Polling...', pollCount);
+                        }
+
+                        // Parar polling após 15 minutos
+                        if (pollCount > 450) {
+                            clearInterval(pollInterval);
+                        }
+                    }, 2000);
                 } else {
                     throw new Error('Link de pagamento não recebido');
                 }

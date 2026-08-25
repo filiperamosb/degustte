@@ -65,9 +65,35 @@ app.post('/api/create-preference', async (req, res) => {
   }
 });
 
+// Armazenar pagamentos aprovados em memória (simplificado)
+const approvedPayments = new Set();
+
 app.post('/webhook', (req, res) => {
   console.log('Webhook recebido:', req.body);
+
+  // Se for notificação de pagamento aprovado
+  if (req.body.type === 'payment' && req.body.action === 'payment.created') {
+    const reference = req.body.data?.id;
+    if (reference) {
+      approvedPayments.add(reference);
+      console.log('Pagamento aprovado:', reference);
+    }
+  }
+
   res.json({ status: 'received' });
+});
+
+// Endpoint para verificar status do pagamento
+app.get('/api/check-payment', (req, res) => {
+  const reference = req.query.reference;
+  console.log('Verificando pagamento:', reference);
+
+  // Aqui você poderia consultar a API do MercadoPago
+  // Por enquanto, vamos retornar um placeholder
+  res.json({
+    approved: false,
+    message: 'Aguardando confirmação do MercadoPago'
+  });
 });
 
 app.get('/sucesso', (req, res) => {
